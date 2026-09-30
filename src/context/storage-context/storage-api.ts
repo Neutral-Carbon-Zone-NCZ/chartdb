@@ -30,7 +30,7 @@ const send = async <T>(
     });
 
     if (response.status === 401) {
-        // Session expired: reload so oauth2-proxy sends the user to Google.
+        // Credentials rejected (e.g. password changed): reload to re-prompt.
         window.location.reload();
     }
 

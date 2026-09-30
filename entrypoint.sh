@@ -1,59 +1,50 @@
 #!/bin/sh
 set -eu
 
-# Fail closed: refuse to start without Google OAuth and database settings.
-: "${OAUTH2_PROXY_CLIENT_ID:?OAUTH2_PROXY_CLIENT_ID is required}"
-: "${OAUTH2_PROXY_CLIENT_SECRET:?OAUTH2_PROXY_CLIENT_SECRET is required}"
-: "${OAUTH2_PROXY_COOKIE_SECRET:?OAUTH2_PROXY_COOKIE_SECRET is required}"
-: "${OAUTH2_PROXY_REDIRECT_URL:?OAUTH2_PROXY_REDIRECT_URL is required (https://<host>/oauth2/callback)}"
+# Fail closed: refuse to start without the shared password or database.
+: "${APP_PASSWORD:?APP_PASSWORD is required}"
 : "${DATABASE_URL:?DATABASE_URL is required}"
+: "${APP_USERNAME:=ncz}"
+# nginx's password file uses ':' as a field separator.
+case "$APP_USERNAME$APP_PASSWORD" in
+    *:*) echo "APP_USERNAME and APP_PASSWORD must not contain ':'" >&2; exit 1 ;;
+esac
 
-# Internal ports (localhost only). The public port is PORT (default 80).
 PUBLIC_PORT="${PORT:-80}"
-WEB_PORT=18080
 API_PORT=13000
-if [ "$PUBLIC_PORT" = "$WEB_PORT" ] || [ "$PUBLIC_PORT" = "$API_PORT" ]; then
+if [ "$PUBLIC_PORT" = "$API_PORT" ]; then
     echo "PORT=$PUBLIC_PORT is reserved for internal use; choose another port" >&2
     exit 1
 fi
-export WEB_PORT API_PORT
+export PUBLIC_PORT API_PORT
 
-# Google sign-in restricted to the company domain. The API re-checks it.
-: "${ALLOWED_EMAIL_DOMAINS:=nczgroup.com}"
-: "${OAUTH2_PROXY_EMAIL_DOMAINS:=$ALLOWED_EMAIL_DOMAINS}"
-: "${OAUTH2_PROXY_PROVIDER:=google}"
-: "${OAUTH2_PROXY_HTTP_ADDRESS:=0.0.0.0:$PUBLIC_PORT}"
-: "${OAUTH2_PROXY_UPSTREAMS:=http://127.0.0.1:$WEB_PORT/}"
-: "${OAUTH2_PROXY_REVERSE_PROXY:=true}"
-: "${OAUTH2_PROXY_SKIP_PROVIDER_BUTTON:=true}"
-: "${OAUTH2_PROXY_COOKIE_SECURE:=true}"
-: "${OAUTH2_PROXY_PASS_USER_HEADERS:=true}"
-# Return 401 (not a Google redirect) for expired sessions on API calls.
-: "${OAUTH2_PROXY_API_ROUTES:=^/api/}"
-export ALLOWED_EMAIL_DOMAINS OAUTH2_PROXY_EMAIL_DOMAINS OAUTH2_PROXY_PROVIDER \
-    OAUTH2_PROXY_HTTP_ADDRESS OAUTH2_PROXY_UPSTREAMS OAUTH2_PROXY_REVERSE_PROXY \
-    OAUTH2_PROXY_SKIP_PROVIDER_BUTTON OAUTH2_PROXY_COOKIE_SECURE \
-    OAUTH2_PROXY_PASS_USER_HEADERS OAUTH2_PROXY_API_ROUTES
+# nginx reads {PLAIN} entries natively; the file never leaves the container.
+umask 077
+printf '%s:{PLAIN}%s\n' "$APP_USERNAME" "$APP_PASSWORD" > /etc/nginx/htpasswd
+chown nginx /etc/nginx/htpasswd
+umask 022
+
+# Runtime config as a static file, so it sits behind the password like any
+# other asset (an nginx `return` would bypass auth_basic).
+node /app/server/write-runtime-config.ts > /usr/share/nginx/html/config.js
 
 # Replace placeholders in nginx.conf
-envsubst '${WEB_PORT} ${API_PORT} ${OPENAI_API_KEY} ${OPENAI_API_ENDPOINT} ${LLM_MODEL_NAME} ${HIDE_CHARTDB_CLOUD} ${DISABLE_ANALYTICS}' < /etc/nginx/http.d/default.conf.template > /etc/nginx/http.d/default.conf
+envsubst '${PUBLIC_PORT} ${API_PORT}' < /etc/nginx/http.d/default.conf.template > /etc/nginx/http.d/default.conf
 
 node /app/server/index.ts &
 API_PID=$!
 nginx -g 'daemon off;' &
 NGINX_PID=$!
-oauth2-proxy &
-PROXY_PID=$!
 
 stopping=false
-trap 'stopping=true; kill -TERM $API_PID $NGINX_PID $PROXY_PID 2>/dev/null || true' TERM INT
+trap 'stopping=true; kill -TERM $API_PID $NGINX_PID 2>/dev/null || true' TERM INT
 
-# Exit as soon as any process dies so the container restarts cleanly.
-while kill -0 $API_PID 2>/dev/null && kill -0 $NGINX_PID 2>/dev/null && kill -0 $PROXY_PID 2>/dev/null; do
+# Exit as soon as either process dies so the container restarts cleanly.
+while kill -0 $API_PID 2>/dev/null && kill -0 $NGINX_PID 2>/dev/null; do
     sleep 2
 done
 
-kill -TERM $API_PID $NGINX_PID $PROXY_PID 2>/dev/null || true
+kill -TERM $API_PID $NGINX_PID 2>/dev/null || true
 wait
 if [ "$stopping" = true ]; then exit 0; fi
 echo "A service exited unexpectedly; stopping container" >&2

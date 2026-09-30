@@ -11,5 +11,5 @@
         "allowImportingTsExtensions": true,
         "skipLibCheck": true
     },
-    "include": ["index.ts"]
+    "include": ["index.ts", "write-runtime-config.ts"]
 }

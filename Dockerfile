@@ -28,16 +28,13 @@ WORKDIR /app/server
 COPY server/package.json server/package-lock.json ./
 RUN npm ci --omit=dev
 
-FROM quay.io/oauth2-proxy/oauth2-proxy:v7.15.4 AS oauth2-proxy
-
 FROM node:24-alpine AS production
 
 RUN apk add --no-cache nginx gettext && rm -f /etc/nginx/http.d/default.conf
 
-COPY --from=oauth2-proxy /bin/oauth2-proxy /usr/local/bin/oauth2-proxy
 COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
 COPY --from=server-deps /app/server/node_modules /app/server/node_modules
-COPY server/package.json server/index.ts /app/server/
+COPY server/package.json server/index.ts server/write-runtime-config.ts /app/server/
 COPY ./default.conf.template /etc/nginx/http.d/default.conf.template
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

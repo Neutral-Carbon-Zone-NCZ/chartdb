@@ -1,8 +1,8 @@
 // ChartDB persistence API.
 //
-// Stores diagrams in PostgreSQL. Runs behind oauth2-proxy, which authenticates
-// users with Google and forwards the verified address in X-Forwarded-Email.
-// The server binds to localhost only, so the proxy is the sole entry point.
+// Stores diagrams in PostgreSQL. Runs behind nginx, which enforces the shared
+// password (HTTP basic auth) and forwards the login name in X-Forwarded-User.
+// The server binds to localhost only, so nginx is the sole entry point.
 import http from 'node:http';
 import pg from 'pg';
 
@@ -32,12 +32,8 @@ const isProduction = process.env.NODE_ENV === 'production';
 const databaseUrl = process.env.DATABASE_URL;
 const port = Number(process.env.API_PORT ?? 3000);
 const host = process.env.API_HOST ?? '127.0.0.1';
-const allowedDomains = (process.env.ALLOWED_EMAIL_DOMAINS ?? 'nczgroup.com')
-    .split(',')
-    .map((d) => d.trim().toLowerCase())
-    .filter(Boolean);
-// Local development without oauth2-proxy only. Ignored in production.
-const devUserEmail = isProduction ? undefined : process.env.DEV_USER_EMAIL;
+// Local development without nginx only. Ignored in production.
+const devUser = isProduction ? undefined : process.env.DEV_USER;
 
 if (!databaseUrl) {
     console.error('DATABASE_URL is required');
@@ -67,16 +63,29 @@ CREATE INDEX IF NOT EXISTS diagram_entities_diagram_idx
     ON diagram_entities (diagram_id, kind);
 
 CREATE TABLE IF NOT EXISTS user_configs (
-    email  text PRIMARY KEY,
-    data   jsonb NOT NULL
+    user_id  text PRIMARY KEY,
+    data     jsonb NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS diagram_filters (
-    email       text NOT NULL,
+    user_id     text NOT NULL,
     diagram_id  text NOT NULL,
     data        jsonb NOT NULL,
-    PRIMARY KEY (email, diagram_id)
+    PRIMARY KEY (user_id, diagram_id)
 );
+
+-- Early deployments keyed these tables by Google email.
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns
+               WHERE table_name = 'user_configs' AND column_name = 'email') THEN
+        ALTER TABLE user_configs RENAME COLUMN email TO user_id;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns
+               WHERE table_name = 'diagram_filters' AND column_name = 'email') THEN
+        ALTER TABLE diagram_filters RENAME COLUMN email TO user_id;
+    END IF;
+END $$;
 `;
 
 class HttpError extends Error {
@@ -145,23 +154,13 @@ const stripCollections = (diagram: Json): Json => {
     return meta;
 };
 
-const emailDomainAllowed = (email: string): boolean => {
-    const domain = email.split('@').pop()?.toLowerCase() ?? '';
-    return allowedDomains.some(
-        (allowed) => domain === allowed || domain.endsWith(`.${allowed}`)
-    );
-};
-
 const authenticate = (req: http.IncomingMessage): string => {
-    const header = req.headers['x-forwarded-email'];
-    const email = (Array.isArray(header) ? header[0] : header) ?? devUserEmail;
-    if (!email) {
+    const header = req.headers['x-forwarded-user'];
+    const user = (Array.isArray(header) ? header[0] : header) || devUser;
+    if (!user) {
         throw new HttpError(401, 'Not authenticated');
     }
-    if (!emailDomainAllowed(email)) {
-        throw new HttpError(403, 'Email domain not allowed');
-    }
-    return email.toLowerCase();
+    return user.toLowerCase();
 };
 
 const readJson = async (req: http.IncomingMessage): Promise<unknown> => {
@@ -248,7 +247,7 @@ const insertEntity = (
 // ---------- Routing ----------
 
 type Handler = (ctx: {
-    email: string;
+    user: string;
     params: string[];
     url: URL;
     body: () => Promise<unknown>;
@@ -260,13 +259,13 @@ const route = (method: string, path: string, handler: Handler) => {
     routes.push({ method, pattern, handler });
 };
 
-route('GET', '/api/me', async ({ email }) => ({ email }));
+route('GET', '/api/me', async ({ user }) => ({ user }));
 
 // Config (per user)
-route('GET', '/api/config', async ({ email }) => {
+route('GET', '/api/config', async ({ user }) => {
     const existing = await pool.query<{ data: Json }>(
-        'SELECT data FROM user_configs WHERE email = $1',
-        [email]
+        'SELECT data FROM user_configs WHERE user_id = $1',
+        [user]
     );
     if (existing.rows[0]) {
         return existing.rows[0].data;
@@ -276,29 +275,29 @@ route('GET', '/api/config', async ({ email }) => {
     );
     const config = { defaultDiagramId: first.rows[0]?.id ?? '' };
     const { rows } = await pool.query<{ data: Json }>(
-        `INSERT INTO user_configs (email, data) VALUES ($1, $2)
-         ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email
+        `INSERT INTO user_configs (user_id, data) VALUES ($1, $2)
+         ON CONFLICT (user_id) DO UPDATE SET user_id = EXCLUDED.user_id
          RETURNING data`,
-        [email, config]
+        [user, config]
     );
     return rows[0].data;
 });
 
-route('PATCH', '/api/config', async ({ email, body }) => {
+route('PATCH', '/api/config', async ({ user, body }) => {
     const { set, unset } = parsePatch(await body());
     await pool.query(
-        `INSERT INTO user_configs (email, data) VALUES ($1, $2::jsonb - $3::text[])
-         ON CONFLICT (email)
+        `INSERT INTO user_configs (user_id, data) VALUES ($1, $2::jsonb - $3::text[])
+         ON CONFLICT (user_id)
          DO UPDATE SET data = (user_configs.data || $2::jsonb) - $3::text[]`,
-        [email, set, unset]
+        [user, set, unset]
     );
 });
 
 // Diagram filters (per user)
-route('GET', '/api/diagrams/:id/filter', async ({ email, params: [id] }) => {
+route('GET', '/api/diagrams/:id/filter', async ({ user, params: [id] }) => {
     const { rows } = await pool.query<{ data: Json }>(
-        'SELECT data FROM diagram_filters WHERE email = $1 AND diagram_id = $2',
-        [email, id]
+        'SELECT data FROM diagram_filters WHERE user_id = $1 AND diagram_id = $2',
+        [user, id]
     );
     return rows[0]?.data ?? null;
 });
@@ -306,20 +305,20 @@ route('GET', '/api/diagrams/:id/filter', async ({ email, params: [id] }) => {
 route(
     'PUT',
     '/api/diagrams/:id/filter',
-    async ({ email, params: [id], body }) => {
+    async ({ user, params: [id], body }) => {
         const filter = requireObject(await body(), 'filter');
         await pool.query(
-            `INSERT INTO diagram_filters (email, diagram_id, data) VALUES ($1, $2, $3)
-         ON CONFLICT (email, diagram_id) DO UPDATE SET data = EXCLUDED.data`,
-            [email, id, { ...filter, diagramId: id }]
+            `INSERT INTO diagram_filters (user_id, diagram_id, data) VALUES ($1, $2, $3)
+         ON CONFLICT (user_id, diagram_id) DO UPDATE SET data = EXCLUDED.data`,
+            [user, id, { ...filter, diagramId: id }]
         );
     }
 );
 
-route('DELETE', '/api/diagrams/:id/filter', async ({ email, params: [id] }) => {
+route('DELETE', '/api/diagrams/:id/filter', async ({ user, params: [id] }) => {
     await pool.query(
-        'DELETE FROM diagram_filters WHERE email = $1 AND diagram_id = $2',
-        [email, id]
+        'DELETE FROM diagram_filters WHERE user_id = $1 AND diagram_id = $2',
+        [user, id]
     );
 });
 
@@ -334,14 +333,14 @@ route('GET', '/api/diagrams', async ({ url }) => {
     );
 });
 
-route('POST', '/api/diagrams', async ({ email, body }) => {
+route('POST', '/api/diagrams', async ({ user, body }) => {
     const diagram = requireObject(await body(), 'diagram');
     const id = requireId(diagram, 'diagram');
     await withTransaction(async (client) => {
         await client.query(
             `INSERT INTO diagrams (id, data, created_by, updated_by)
              VALUES ($1, $2, $3, $3)`,
-            [id, stripCollections(diagram), email]
+            [id, stripCollections(diagram), user]
         );
         for (const kind of ENTITY_KINDS) {
             const entities = diagram[DIAGRAM_COLLECTION_KEYS[kind]] ?? [];
@@ -372,7 +371,7 @@ route('GET', '/api/diagrams/:id', async ({ params: [id], url }) => {
     return diagram;
 });
 
-route('PATCH', '/api/diagrams/:id', async ({ email, params: [id], body }) => {
+route('PATCH', '/api/diagrams/:id', async ({ user, params: [id], body }) => {
     const { set, unset } = parsePatch(await body());
     const newId = typeof set.id === 'string' && set.id ? set.id : id;
     await withTransaction(async (client) => {
@@ -381,7 +380,7 @@ route('PATCH', '/api/diagrams/:id', async ({ email, params: [id], body }) => {
              SET id = $2, data = (data || $3::jsonb) - $4::text[],
                  updated_by = $5, updated_at = now()
              WHERE id = $1`,
-            [id, newId, stripCollections(set), unset, email]
+            [id, newId, stripCollections(set), unset, user]
         );
         if (newId !== id) {
             await client.query(
@@ -514,14 +513,14 @@ const send = (res: http.ServerResponse, status: number, payload?: unknown) => {
 const server = http.createServer(async (req, res) => {
     const url = new URL(req.url ?? '/', 'http://localhost');
     try {
-        const email = authenticate(req);
+        const user = authenticate(req);
         const path = decodeURI(url.pathname);
         for (const { method, pattern, handler } of routes) {
             const match = method === req.method ? pattern.exec(path) : null;
             if (!match) continue;
             const params = match.slice(1).map(decodeURIComponent);
             const result = await handler({
-                email,
+                user,
                 params,
                 url,
                 body: () => readJson(req),

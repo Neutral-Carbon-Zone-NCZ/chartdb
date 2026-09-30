@@ -1,9 +1,14 @@
 server {
-    # Internal only: oauth2-proxy is the public entry point and forwards here.
-    listen       127.0.0.1:${WEB_PORT};
+    listen       ${PUBLIC_PORT};
+    listen  [::]:${PUBLIC_PORT};
+
+    root   /usr/share/nginx/html;
+
+    # Shared team password for everything except the health check.
+    auth_basic           "ChartDB";
+    auth_basic_user_file /etc/nginx/htpasswd;
 
     location / {
-        root   /usr/share/nginx/html;
         index  index.html index.htm;
 	    try_files  $uri $uri/ /index.html;
     }
@@ -11,23 +16,22 @@ server {
     location /api/ {
         proxy_pass http://127.0.0.1:${API_PORT};
         proxy_http_version 1.1;
+        # Overwrite any client-supplied value with the authenticated login.
+        proxy_set_header X-Forwarded-User $remote_user;
         client_max_body_size 50m;
         proxy_read_timeout 120s;
     }
 
-    location /config.js {
-        default_type application/javascript;
-        return 200 "window.env = {
-            OPENAI_API_KEY: \"$OPENAI_API_KEY\",
-            OPENAI_API_ENDPOINT: \"$OPENAI_API_ENDPOINT\",
-            LLM_MODEL_NAME: \"$LLM_MODEL_NAME\",
-            HIDE_CHARTDB_CLOUD: \"$HIDE_CHARTDB_CLOUD\",
-            DISABLE_ANALYTICS: \"$DISABLE_ANALYTICS\"
-        };";
+    # Written at container start by entrypoint.sh.
+    location = /config.js {
+        add_header Cache-Control "no-store";
+    }
+
+    location = /ping {
+        auth_basic off;
+        default_type text/plain;
+        return 200 "OK";
     }
 
     error_page   500 502 503 504  /50x.html;
-    location = /50x.html {
-        root   /usr/share/nginx/html;
-    }
 }

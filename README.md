@@ -96,14 +96,13 @@ npm install
 VITE_OPENAI_API_KEY=<YOUR_OPEN_AI_KEY> npm run build
 ```
 
-### NCZ deployment (Google sign-in + PostgreSQL)
+### NCZ deployment (shared password + PostgreSQL)
 
-This fork requires Google sign-in and stores diagrams in PostgreSQL instead of the browser.
+This fork puts the app behind one shared team password and stores diagrams in PostgreSQL instead of the browser.
 
-- **Sign-in:** [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/) runs inside the container in front of everything, including static assets, `config.js` and `/api`. Only `@nczgroup.com` accounts get through (`ALLOWED_EMAIL_DOMAINS`). The persistence API checks the domain again.
-- **Storage:** diagrams are shared by everyone in the organisation. Each user keeps their own default diagram and filters. Diagrams already saved in a user's browser upload automatically the first time they sign in. The browser copy stays as a backup.
-- **Google OAuth client:** create a _Web application_ OAuth client. Set the consent screen user type to **Internal**. Add `https://<host>/oauth2/callback` as an authorised redirect URI.
-- **Configure:** copy `.env.example` to `.env` and fill it in. The container refuses to start if the OAuth or database settings are missing.
+- **Login:** nginx asks for `APP_USERNAME` / `APP_PASSWORD` (HTTP basic auth over HTTPS) before serving anything, including static assets, `config.js` and `/api`. `/ping` is the only open path.
+- **Storage:** everyone shares the same diagrams. Diagrams already saved in someone's browser upload automatically the first time they open the app. The browser copy stays as a backup.
+- **Configure:** copy `.env.example` to `.env` and fill it in. The container refuses to start without `APP_PASSWORD` or a database.
 - **Run:** `docker compose up -d --build` starts the app and PostgreSQL (see `docker-compose.yml`). To use an external database, set `DATABASE_URL` and run the image on its own. The container listens on port 80 (or `PORT`). `/ping` is the health check.
 - **Local development:** start PostgreSQL, run `scripts/dev-api.sh` with `DATABASE_URL` set, then run `npm run dev`.
 
