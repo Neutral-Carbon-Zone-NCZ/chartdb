@@ -547,6 +547,7 @@ export const ru: LanguageTranslation = {
             empty_diagram_description: 'Создайте таблицу, чтобы начать',
             no_tables_description: 'Попробуйте изменить поиск или фильтр',
             clear_filter: 'Очистить фильтр',
+            schema_color: 'Change color of all tables in schema',
         },
 
         copy_to_clipboard: 'Скопировать в буфер обмена',

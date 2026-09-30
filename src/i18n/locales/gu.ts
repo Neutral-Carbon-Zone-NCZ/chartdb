@@ -550,6 +550,7 @@ export const gu: LanguageTranslation = {
             no_tables_description:
                 'તમારી શોધ અથવા ફિલ્ટર સમાયોજિત કરવાનો પ્રયાસ કરો',
             clear_filter: 'ફિલ્ટર સાફ કરો',
+            schema_color: 'Change color of all tables in schema',
         },
 
         snap_to_grid_tooltip: 'ગ્રિડ પર સ્નેપ કરો (જમાવટ {{key}})',

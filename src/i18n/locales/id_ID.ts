@@ -549,6 +549,7 @@ export const id_ID: LanguageTranslation = {
             empty_diagram_description: 'Buat tabel untuk memulai',
             no_tables_description: 'Coba sesuaikan pencarian atau filter Anda',
             clear_filter: 'Hapus filter',
+            schema_color: 'Change color of all tables in schema',
         },
 
         snap_to_grid_tooltip: 'Snap ke Kisi (Tahan {{key}})',

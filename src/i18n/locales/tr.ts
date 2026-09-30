@@ -538,6 +538,7 @@ export const tr: LanguageTranslation = {
             no_tables_description:
                 'Aramanızı veya filtrenizi ayarlamayı deneyin',
             clear_filter: 'Filtreyi temizle',
+            schema_color: 'Change color of all tables in schema',
         },
 
         // TODO: Translate

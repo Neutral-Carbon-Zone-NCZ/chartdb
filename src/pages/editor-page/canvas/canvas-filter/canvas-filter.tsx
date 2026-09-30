@@ -36,7 +36,8 @@ export interface CanvasFilterProps {
 
 export const CanvasFilter: React.FC<CanvasFilterProps> = ({ onClose }) => {
     const { t } = useTranslation();
-    const { tables, databaseType, areas } = useChartDB();
+    const { tables, databaseType, areas, readonly, updateTablesState } =
+        useChartDB();
     const { checkIfNewTable } = useDiff();
     const {
         filter,
@@ -67,6 +68,7 @@ export const CanvasFilter: React.FC<CanvasFilterProps> = ({ onClose }) => {
                     schema: table.schema,
                     parentAreaId: table.parentAreaId,
                     isView: table.isView,
+                    color: table.color,
                 })),
         [tables, showDBViews, checkIfNewTable]
     );
@@ -172,12 +174,28 @@ export const CanvasFilter: React.FC<CanvasFilterProps> = ({ onClose }) => {
         setSearchQuery('');
     }, []);
 
+    // Recolor every table in a schema as a single undo step
+    const setTablesColor = useCallback(
+        (tableIds: string[], color: string) => {
+            const ids = new Set(tableIds);
+            updateTablesState(
+                (currentTables) =>
+                    currentTables.map((table) =>
+                        ids.has(table.id) ? { id: table.id, color } : table
+                    ),
+                { updateHistory: true }
+            );
+        },
+        [updateTablesState]
+    );
+
     // Render actions with proper memoization for performance
     const renderActions = useCallback(
         (node: TreeNode<NodeType, NodeContext>) => (
             <FilterItemActions
                 node={node}
                 databaseWithSchemas={databaseWithSchemas}
+                setTablesColor={readonly ? undefined : setTablesColor}
                 toggleSchemaFilter={toggleSchemaFilter}
                 toggleTableFilter={toggleTableFilter}
                 clearTableIdsFilter={clearTableIdsFilter}
@@ -188,6 +206,8 @@ export const CanvasFilter: React.FC<CanvasFilterProps> = ({ onClose }) => {
         ),
         [
             databaseWithSchemas,
+            readonly,
+            setTablesColor,
             toggleSchemaFilter,
             toggleTableFilter,
             clearTableIdsFilter,

@@ -1,7 +1,13 @@
 export type NodeType = 'schema' | 'area' | 'table';
 export type GroupingMode = 'schema' | 'area';
 
-export type SchemaContext = { name: string; visible: boolean };
+export type SchemaContext = {
+    name: string;
+    visible: boolean;
+    tableIds: string[];
+    // Shared color of the schema's tables; undefined when they differ.
+    color?: string;
+};
 export type AreaContext = {
     id: string;
     name: string;
@@ -25,4 +31,5 @@ export type RelevantTableData = {
     schema?: string | null;
     parentAreaId?: string | null;
     isView?: boolean;
+    color?: string;
 };

@@ -197,6 +197,10 @@ export const generateTreeDataBySchemas = ({
             (t) => t.visible
         ).length;
         const schemaVisible = visibleCount === schemaTables.length;
+        const firstColor = schemaTables[0]?.color;
+        const sharedColor = schemaTables.every((t) => t.color === firstColor)
+            ? firstColor
+            : undefined;
 
         const schemaNode: TreeNode<NodeType, NodeContext> = {
             id: `schema-${schemaName}`,
@@ -208,6 +212,8 @@ export const generateTreeDataBySchemas = ({
             context: {
                 name: schemaName,
                 visible: schemaVisible,
+                tableIds: schemaTables.map((t) => t.id),
+                color: sharedColor,
             } satisfies SchemaContext,
             className: !schemaVisible ? 'opacity-50' : '',
             children: createTableChildren(tablesWithVisibility),

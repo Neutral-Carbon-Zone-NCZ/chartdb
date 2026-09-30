@@ -552,6 +552,7 @@ export const ja: LanguageTranslation = {
             empty_diagram_description: 'テーブルを作成して開始',
             no_tables_description: '検索またはフィルターを調整してください',
             clear_filter: 'フィルターをクリア',
+            schema_color: 'Change color of all tables in schema',
         },
 
         // TODO: Add translations

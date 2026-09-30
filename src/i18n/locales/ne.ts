@@ -553,6 +553,7 @@ export const ne: LanguageTranslation = {
             no_tables_description:
                 'तपाईंको खोज वा फिल्टर समायोजन गर्ने प्रयास गर्नुहोस्',
             clear_filter: 'फिल्टर हटाउनुहोस्',
+            schema_color: 'Change color of all tables in schema',
         },
 
         snap_to_grid_tooltip: 'ग्रिडमा स्न्याप गर्नुहोस् ({{key}} थिच्नुहोस)',

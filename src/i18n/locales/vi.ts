@@ -548,6 +548,7 @@ export const vi: LanguageTranslation = {
             no_tables_description:
                 'Thử điều chỉnh tìm kiếm hoặc bộ lọc của bạn',
             clear_filter: 'Xóa bộ lọc',
+            schema_color: 'Change color of all tables in schema',
         },
 
         snap_to_grid_tooltip: 'Căn lưới (Giữ phím {{key}})',

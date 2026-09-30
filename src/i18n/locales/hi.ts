@@ -554,6 +554,7 @@ export const hi: LanguageTranslation = {
             no_tables_description:
                 'अपनी खोज या फ़िल्टर समायोजित करने का प्रयास करें',
             clear_filter: 'फ़िल्टर साफ़ करें',
+            schema_color: 'Change color of all tables in schema',
         },
 
         // TODO: Add translations

@@ -547,6 +547,7 @@ export const fr: LanguageTranslation = {
             no_tables_description:
                 'Essayez de modifier votre recherche ou filtre',
             clear_filter: 'Effacer le filtre',
+            schema_color: 'Change color of all tables in schema',
         },
 
         snap_to_grid_tooltip:

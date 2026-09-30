@@ -560,6 +560,7 @@ export const mr: LanguageTranslation = {
             no_tables_description:
                 'तुमची शोध किंवा फिल्टर समायोजित करण्याचा प्रयत्न करा',
             clear_filter: 'फिल्टर साफ करा',
+            schema_color: 'Change color of all tables in schema',
         },
 
         // TODO: Add translations

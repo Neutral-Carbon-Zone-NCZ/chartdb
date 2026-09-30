@@ -538,6 +538,7 @@ export const en = {
             empty_diagram_description: 'Create a table to get started',
             no_tables_description: 'Try adjusting your search or filter',
             clear_filter: 'Clear filter',
+            schema_color: 'Change color of all tables in schema',
         },
 
         snap_to_grid_tooltip: 'Snap to Grid (Hold {{key}})',

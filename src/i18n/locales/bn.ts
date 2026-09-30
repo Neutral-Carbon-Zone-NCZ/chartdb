@@ -551,6 +551,7 @@ export const bn: LanguageTranslation = {
             empty_diagram_description: 'শুরু করতে একটি টেবিল তৈরি করুন',
             no_tables_description: 'আপনার অনুসন্ধান বা ফিল্টার সামঞ্জস্য করুন',
             clear_filter: 'ফিল্টার মুছুন',
+            schema_color: 'Change color of all tables in schema',
         },
 
         snap_to_grid_tooltip: 'গ্রিডে স্ন্যাপ করুন (অবস্থান {{key}})',

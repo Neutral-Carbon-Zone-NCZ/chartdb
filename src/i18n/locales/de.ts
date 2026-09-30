@@ -553,6 +553,7 @@ export const de: LanguageTranslation = {
             no_tables_description:
                 'Versuchen Sie, Ihre Suche oder Filter anzupassen',
             clear_filter: 'Filter löschen',
+            schema_color: 'Change color of all tables in schema',
         },
 
         // TODO: Add translations

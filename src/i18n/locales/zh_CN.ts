@@ -538,6 +538,7 @@ export const zh_CN: LanguageTranslation = {
             empty_diagram_description: '创建表格以开始',
             no_tables_description: '尝试调整您的搜索或筛选',
             clear_filter: '清除筛选',
+            schema_color: 'Change color of all tables in schema',
         },
 
         snap_to_grid_tooltip: '对齐到网格（按住 {{key}}）',

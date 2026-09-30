@@ -540,6 +540,7 @@ export const ar: LanguageTranslation = {
             empty_diagram_description: 'أنشئ جدولاً للبدء',
             no_tables_description: 'جرب تعديل البحث أو التصفية',
             clear_filter: 'مسح التصفية',
+            schema_color: 'Change color of all tables in schema',
         },
 
         snap_to_grid_tooltip: '({{key}} مغنظة الشبكة (اضغط مع الاستمرار على',

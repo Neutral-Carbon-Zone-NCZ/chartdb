@@ -555,6 +555,7 @@ export const te: LanguageTranslation = {
             no_tables_description:
                 'మీ శోధన లేదా ఫిల్టర్‌ను సర్దుబాటు చేయడానికి ప్రయత్నించండి',
             clear_filter: 'ఫిల్టర్ క్లియర్ చేయండి',
+            schema_color: 'Change color of all tables in schema',
         },
 
         // TODO: Translate

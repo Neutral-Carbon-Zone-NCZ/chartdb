@@ -547,6 +547,7 @@ export const uk: LanguageTranslation = {
             empty_diagram_description: 'Створіть таблицю, щоб почати',
             no_tables_description: 'Спробуйте налаштувати пошук або фільтр',
             clear_filter: 'Очистити фільтр',
+            schema_color: 'Change color of all tables in schema',
         },
 
         snap_to_grid_tooltip: 'Вирівнювати за сіткою (Отримуйте {{key}})',

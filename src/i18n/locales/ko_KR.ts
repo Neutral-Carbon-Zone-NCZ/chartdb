@@ -545,6 +545,7 @@ export const ko_KR: LanguageTranslation = {
             empty_diagram_description: '시작하려면 테이블을 만드세요',
             no_tables_description: '검색 또는 필터를 조정해 보세요',
             clear_filter: '필터 지우기',
+            schema_color: 'Change color of all tables in schema',
         },
 
         snap_to_grid_tooltip: '그리드에 맞추기 ({{key}}를 누른채 유지)',

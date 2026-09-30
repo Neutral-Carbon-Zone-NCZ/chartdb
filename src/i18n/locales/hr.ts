@@ -543,6 +543,7 @@ export const hr: LanguageTranslation = {
             empty_diagram_description: 'Kreirajte tablicu za početak',
             no_tables_description: 'Pokušajte prilagoditi pretragu ili filter',
             clear_filter: 'Očisti filter',
+            schema_color: 'Change color of all tables in schema',
         },
 
         snap_to_grid_tooltip: 'Priljepljivanje na mrežu (Drži {{key}})',

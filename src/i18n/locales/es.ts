@@ -551,6 +551,7 @@ export const es: LanguageTranslation = {
             empty_diagram_description: 'Crea una tabla para comenzar',
             no_tables_description: 'Intenta ajustar tu búsqueda o filtro',
             clear_filter: 'Limpiar filtro',
+            schema_color: 'Change color of all tables in schema',
         },
 
         // TODO: Add translations

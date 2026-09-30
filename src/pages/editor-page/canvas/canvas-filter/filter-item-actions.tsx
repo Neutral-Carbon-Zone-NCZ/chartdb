@@ -14,10 +14,14 @@ import type {
 } from './types';
 import type { FilterTableInfo } from '@/lib/domain/diagram-filter/diagram-filter';
 import { cn } from '@/lib/utils';
+import { ColorPicker } from '@/components/color-picker/color-picker';
+import { useTranslation } from 'react-i18next';
 
 interface FilterItemActionsProps {
     node: TreeNode<NodeType, NodeContext>;
     databaseWithSchemas: boolean;
+    // Omitted in read-only mode.
+    setTablesColor?: (tableIds: string[], color: string) => void;
     toggleSchemaFilter: (schemaId: string) => void;
     toggleTableFilter: (tableId: string) => void;
     clearTableIdsFilter: () => void;
@@ -35,6 +39,7 @@ interface FilterItemActionsProps {
 export const FilterItemActions: React.FC<FilterItemActionsProps> = ({
     node,
     databaseWithSchemas,
+    setTablesColor,
     toggleSchemaFilter,
     toggleTableFilter,
     clearTableIdsFilter,
@@ -43,6 +48,7 @@ export const FilterItemActions: React.FC<FilterItemActionsProps> = ({
     removeTablesFromFilter,
 }) => {
     const { focusOnArea, focusOnTable } = useFocusOn();
+    const { t } = useTranslation();
     if (node.type === 'schema') {
         const context = node.context as SchemaContext;
         const schemaVisible = context.visible;
@@ -50,31 +56,46 @@ export const FilterItemActions: React.FC<FilterItemActionsProps> = ({
         const schemaId = schemaNameToSchemaId(schemaName);
 
         return (
-            <Button
-                variant="ghost"
-                size="sm"
-                className="h-fit w-6 p-0"
-                onClick={(e) => {
-                    e.stopPropagation();
-
-                    if (databaseWithSchemas) {
-                        toggleSchemaFilter(schemaId);
-                    } else {
-                        // Toggle visibility of all tables in this schema
-                        if (schemaVisible) {
-                            setTableIdsFilterEmpty();
-                        } else {
-                            clearTableIdsFilter();
-                        }
-                    }
-                }}
-            >
-                {!schemaVisible ? (
-                    <EyeOff className="!size-3.5 text-muted-foreground" />
-                ) : (
-                    <Eye className="!size-3.5" />
+            <div className="flex h-full items-center gap-1">
+                {setTablesColor && context.tableIds.length > 0 && (
+                    // Keep clicks from toggling the tree row.
+                    <div onClick={(e) => e.stopPropagation()}>
+                        <ColorPicker
+                            color={context.color ?? 'transparent'}
+                            onChange={(color) =>
+                                setTablesColor(context.tableIds, color)
+                            }
+                            className="h-3.5 w-4 rounded-sm border"
+                            title={t('canvas_filter.schema_color')}
+                        />
+                    </div>
                 )}
-            </Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-fit w-6 p-0"
+                    onClick={(e) => {
+                        e.stopPropagation();
+
+                        if (databaseWithSchemas) {
+                            toggleSchemaFilter(schemaId);
+                        } else {
+                            // Toggle visibility of all tables in this schema
+                            if (schemaVisible) {
+                                setTableIdsFilterEmpty();
+                            } else {
+                                clearTableIdsFilter();
+                            }
+                        }
+                    }}
+                >
+                    {!schemaVisible ? (
+                        <EyeOff className="!size-3.5 text-muted-foreground" />
+                    ) : (
+                        <Eye className="!size-3.5" />
+                    )}
+                </Button>
+            </div>
         );
     }
 
