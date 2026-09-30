@@ -94,6 +94,56 @@ const AREA_PADDING = 30;
 const AREA_HEADER_HEIGHT = 50;
 
 /**
+ * Grow an area (never shrink it) so every child table fits inside with
+ * padding and room for the header. Returns null when it already fits.
+ */
+export const getAreaRectToFitTables = (
+    area: Area,
+    childTables: DBTable[]
+): Pick<Area, 'x' | 'y' | 'width' | 'height'> | null => {
+    if (childTables.length === 0) {
+        return null;
+    }
+
+    let left = area.x;
+    let top = area.y;
+    let right = area.x + area.width;
+    let bottom = area.y + area.height;
+
+    childTables.forEach((table) => {
+        const { width, height } = getTableDimensions(table);
+        left = Math.min(left, table.x - AREA_PADDING);
+        top = Math.min(top, table.y - AREA_HEADER_HEIGHT);
+        right = Math.max(right, table.x + width + AREA_PADDING);
+        bottom = Math.max(bottom, table.y + height + AREA_PADDING);
+    });
+
+    if (
+        left === area.x &&
+        top === area.y &&
+        right === area.x + area.width &&
+        bottom === area.y + area.height
+    ) {
+        return null;
+    }
+
+    return { x: left, y: top, width: right - left, height: bottom - top };
+};
+
+/**
+ * Position just to the right of an area, used when a table leaves it so
+ * containment does not immediately pull it back in.
+ */
+export const getPositionOutsideArea = (
+    area: Area,
+    table: DBTable,
+    index = 0
+): { x: number; y: number } => ({
+    x: area.x + area.width + AREA_PADDING * 2,
+    y: area.y + index * (getTableDimensions(table).height + AREA_PADDING),
+});
+
+/**
  * Arrange tables using the relationship-aware algorithm and fit them into an area.
  * Returns the arranged positions and the required area dimensions.
  */

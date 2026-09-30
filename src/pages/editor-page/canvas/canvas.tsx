@@ -111,6 +111,7 @@ import { ConnectionLine } from './connection-line/connection-line';
 import {
     updateTablesParentAreas,
     getTablesInArea,
+    getAreaRectToFitTables,
 } from '@/lib/utils/area-utils';
 import { CanvasFilter } from './canvas-filter/canvas-filter';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -761,12 +762,16 @@ export const Canvas: React.FC<CanvasProps> = ({ initialTables }) => {
                 parentAreaId: string | null;
             }> = [];
 
+            // Area membership is sticky: a table only joins an area when it is
+            // dropped fully inside one while unassigned. Moving an assigned
+            // table grows its area instead (see the effect below); leaving an
+            // area is explicit via the context menu.
             updatedTables.forEach((newTable, index) => {
                 const oldTable = visibleTables[index];
                 if (
                     oldTable &&
-                    (!!newTable.parentAreaId || !!oldTable.parentAreaId) &&
-                    newTable.parentAreaId !== oldTable.parentAreaId
+                    !oldTable.parentAreaId &&
+                    !!newTable.parentAreaId
                 ) {
                     needsUpdate.push({
                         id: newTable.id,
@@ -797,6 +802,25 @@ export const Canvas: React.FC<CanvasProps> = ({ initialTables }) => {
 
         checkParentAreas();
     }, [nodes, updateTablesState]);
+
+    // Grow each area to keep its tables inside after they move or resize.
+    // Skipped mid-drag so storage is written once, when the drag ends.
+    const isDraggingNode = nodes.some((node) => node.dragging);
+    useEffect(() => {
+        if (readonly || isDraggingNode) {
+            return;
+        }
+
+        areas.forEach((area) => {
+            const rect = getAreaRectToFitTables(
+                area,
+                getTablesInArea(area.id, tables)
+            );
+            if (rect) {
+                updateArea(area.id, rect, { updateHistory: false });
+            }
+        });
+    }, [areas, tables, isDraggingNode, readonly, updateArea]);
 
     const onConnectHandler = useCallback(
         async (params: AddEdgeParams) => {

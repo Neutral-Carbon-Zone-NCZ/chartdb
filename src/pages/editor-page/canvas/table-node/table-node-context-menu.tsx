@@ -13,7 +13,10 @@ import { useChartDB } from '@/hooks/use-chartdb';
 import { useLayout } from '@/hooks/use-layout';
 import { cloneTable } from '@/lib/clone';
 import type { DBTable } from '@/lib/domain/db-table';
-import { arrangeTablesForArea } from '@/lib/utils/area-utils';
+import {
+    arrangeTablesForArea,
+    getPositionOutsideArea,
+} from '@/lib/utils/area-utils';
 import {
     Check,
     Copy,
@@ -173,13 +176,25 @@ export const TableNodeContextMenu: React.FC<
             const tableIds = isMultiSelect ? selectedTableIds : [table.id];
 
             if (areaId === null) {
+                // Place leaving tables beside their area, otherwise they would
+                // rejoin it as soon as containment is re-checked.
+                const leavingCount = new Map<string, number>();
                 updateTablesState(
                     (currentTables) =>
-                        currentTables.map((t) =>
-                            tableIds.includes(t.id)
-                                ? { ...t, parentAreaId: null }
-                                : t
-                        ),
+                        currentTables.map((t) => {
+                            if (!tableIds.includes(t.id)) return t;
+                            const area = areas.find(
+                                (a) => a.id === t.parentAreaId
+                            );
+                            if (!area) return { ...t, parentAreaId: null };
+                            const index = leavingCount.get(area.id) ?? 0;
+                            leavingCount.set(area.id, index + 1);
+                            return {
+                                ...t,
+                                ...getPositionOutsideArea(area, t, index),
+                                parentAreaId: null,
+                            };
+                        }),
                     { updateHistory: true }
                 );
                 return;
@@ -191,6 +206,7 @@ export const TableNodeContextMenu: React.FC<
             isMultiSelect,
             selectedTableIds,
             table.id,
+            areas,
             moveToArea,
             updateTablesState,
         ]
