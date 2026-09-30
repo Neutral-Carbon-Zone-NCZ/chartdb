@@ -96,18 +96,16 @@ npm install
 VITE_OPENAI_API_KEY=<YOUR_OPEN_AI_KEY> npm run build
 ```
 
-### Run the Docker Container
+### NCZ deployment (Google sign-in + PostgreSQL)
 
-```bash
-docker run -e OPENAI_API_KEY=<YOUR_OPEN_AI_KEY> -p 8080:80 ghcr.io/chartdb/chartdb:latest
-```
+This fork requires Google sign-in and stores diagrams in PostgreSQL instead of the browser.
 
-#### Build and Run locally
-
-```bash
-docker build -t chartdb .
-docker run -e OPENAI_API_KEY=<YOUR_OPEN_AI_KEY> -p 8080:80 chartdb
-```
+- **Sign-in:** [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/) runs inside the container in front of everything, including static assets, `config.js` and `/api`. Only `@nczgroup.com` accounts get through (`ALLOWED_EMAIL_DOMAINS`). The persistence API checks the domain again.
+- **Storage:** diagrams are shared by everyone in the organisation. Each user keeps their own default diagram and filters. Diagrams already saved in a user's browser upload automatically the first time they sign in. The browser copy stays as a backup.
+- **Google OAuth client:** create a _Web application_ OAuth client. Set the consent screen user type to **Internal**. Add `https://<host>/oauth2/callback` as an authorised redirect URI.
+- **Configure:** copy `.env.example` to `.env` and fill it in. The container refuses to start if the OAuth or database settings are missing.
+- **Run:** `docker compose up -d --build` starts the app and PostgreSQL (see `docker-compose.yml`). To use an external database, set `DATABASE_URL` and run the image on its own. The container listens on port 80 (or `PORT`). `/ping` is the health check.
+- **Local development:** start PostgreSQL, run `scripts/dev-api.sh` with `DATABASE_URL` set, then run `npm run dev`.
 
 #### Using Custom Inference Server
 

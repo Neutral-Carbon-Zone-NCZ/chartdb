@@ -1,0 +1,30 @@
+services:
+  chartdb:
+    build: .
+    ports:
+      - '${CHARTDB_PORT:-8080}:80'
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://chartdb:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@postgres:5432/chartdb
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: chartdb
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: chartdb
+    volumes:
+      - chartdb-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U chartdb']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  chartdb-postgres:
