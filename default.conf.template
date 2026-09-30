@@ -1,6 +1,6 @@
 server {
     # Internal only: oauth2-proxy is the public entry point and forwards here.
-    listen       127.0.0.1:8080;
+    listen       127.0.0.1:${WEB_PORT};
 
     location / {
         root   /usr/share/nginx/html;
@@ -9,7 +9,7 @@ server {
     }
 
     location /api/ {
-        proxy_pass http://127.0.0.1:3000;
+        proxy_pass http://127.0.0.1:${API_PORT};
         proxy_http_version 1.1;
         client_max_body_size 50m;
         proxy_read_timeout 120s;

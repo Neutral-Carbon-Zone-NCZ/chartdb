@@ -8,12 +8,22 @@ set -eu
 : "${OAUTH2_PROXY_REDIRECT_URL:?OAUTH2_PROXY_REDIRECT_URL is required (https://<host>/oauth2/callback)}"
 : "${DATABASE_URL:?DATABASE_URL is required}"
 
+# Internal ports (localhost only). The public port is PORT (default 80).
+PUBLIC_PORT="${PORT:-80}"
+WEB_PORT=18080
+API_PORT=13000
+if [ "$PUBLIC_PORT" = "$WEB_PORT" ] || [ "$PUBLIC_PORT" = "$API_PORT" ]; then
+    echo "PORT=$PUBLIC_PORT is reserved for internal use; choose another port" >&2
+    exit 1
+fi
+export WEB_PORT API_PORT
+
 # Google sign-in restricted to the company domain. The API re-checks it.
 : "${ALLOWED_EMAIL_DOMAINS:=nczgroup.com}"
 : "${OAUTH2_PROXY_EMAIL_DOMAINS:=$ALLOWED_EMAIL_DOMAINS}"
 : "${OAUTH2_PROXY_PROVIDER:=google}"
-: "${OAUTH2_PROXY_HTTP_ADDRESS:=0.0.0.0:${PORT:-80}}"
-: "${OAUTH2_PROXY_UPSTREAMS:=http://127.0.0.1:8080/}"
+: "${OAUTH2_PROXY_HTTP_ADDRESS:=0.0.0.0:$PUBLIC_PORT}"
+: "${OAUTH2_PROXY_UPSTREAMS:=http://127.0.0.1:$WEB_PORT/}"
 : "${OAUTH2_PROXY_REVERSE_PROXY:=true}"
 : "${OAUTH2_PROXY_SKIP_PROVIDER_BUTTON:=true}"
 : "${OAUTH2_PROXY_COOKIE_SECURE:=true}"
@@ -26,7 +36,7 @@ export ALLOWED_EMAIL_DOMAINS OAUTH2_PROXY_EMAIL_DOMAINS OAUTH2_PROXY_PROVIDER \
     OAUTH2_PROXY_PASS_USER_HEADERS OAUTH2_PROXY_API_ROUTES
 
 # Replace placeholders in nginx.conf
-envsubst '${OPENAI_API_KEY} ${OPENAI_API_ENDPOINT} ${LLM_MODEL_NAME} ${HIDE_CHARTDB_CLOUD} ${DISABLE_ANALYTICS}' < /etc/nginx/http.d/default.conf.template > /etc/nginx/http.d/default.conf
+envsubst '${WEB_PORT} ${API_PORT} ${OPENAI_API_KEY} ${OPENAI_API_ENDPOINT} ${LLM_MODEL_NAME} ${HIDE_CHARTDB_CLOUD} ${DISABLE_ANALYTICS}' < /etc/nginx/http.d/default.conf.template > /etc/nginx/http.d/default.conf
 
 node /app/server/index.ts &
 API_PID=$!
