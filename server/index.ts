@@ -1,8 +1,10 @@
 // ChartDB persistence API.
 //
-// Stores diagrams in PostgreSQL. Runs behind nginx, which enforces the shared
-// password (HTTP basic auth) and forwards the login name in X-Forwarded-User.
-// The server binds to localhost only, so nginx is the sole entry point.
+// Stores diagrams in PostgreSQL. Runs behind nginx, which checks every request
+// against /api/auth/verify here and forwards the login name in
+// X-Forwarded-User. The server binds to localhost only, so nginx is the sole
+// entry point.
+import crypto from 'node:crypto';
 import http from 'node:http';
 import pg from 'pg';
 
@@ -35,8 +37,16 @@ const host = process.env.API_HOST ?? '127.0.0.1';
 // Local development without nginx only. Ignored in production.
 const devUser = isProduction ? undefined : process.env.DEV_USER;
 
+const appUsername = (process.env.APP_USERNAME ?? 'ncz').toLowerCase();
+const appPassword = process.env.APP_PASSWORD;
+
 if (!databaseUrl) {
     console.error('DATABASE_URL is required');
+    process.exit(1);
+}
+
+if (isProduction && !appPassword) {
+    console.error('APP_PASSWORD is required');
     process.exit(1);
 }
 
@@ -156,12 +166,118 @@ const stripCollections = (diagram: Json): Json => {
 
 const authenticate = (req: http.IncomingMessage): string => {
     const header = req.headers['x-forwarded-user'];
-    const user = (Array.isArray(header) ? header[0] : header) || devUser;
+    const forwarded = Array.isArray(header) ? header[0] : header;
+    // nginx normally resolves the user for us, but check the session directly
+    // too so the API never depends on the proxy alone.
+    const user = forwarded || currentUser(req) || devUser;
     if (!user) {
         throw new HttpError(401, 'Not authenticated');
     }
     return user.toLowerCase();
 };
+
+// ---------- Session cookies ----------
+//
+// Signing key derives from the shared password, so sessions survive restarts
+// and deploys but every session dies the moment the password changes. That
+// keeps the login persistent without another secret to manage.
+const SESSION_COOKIE = 'chartdb_session';
+const SESSION_TTL_MS = 365 * 24 * 60 * 60 * 1000;
+const sessionKey = crypto
+    .createHash('sha256')
+    .update(`${appUsername}:${appPassword ?? ''}`)
+    .digest();
+
+const signPayload = (payload: string) =>
+    crypto.createHmac('sha256', sessionKey).update(payload).digest('base64url');
+
+// Comparison that does not leak the secret's length or contents by timing.
+const secretsMatch = (a: string, b: string) => {
+    const left = Buffer.from(a, 'utf8');
+    const right = Buffer.from(b, 'utf8');
+    // Hash first so timingSafeEqual always sees equal-length buffers.
+    return crypto.timingSafeEqual(
+        crypto.createHash('sha256').update(left).digest(),
+        crypto.createHash('sha256').update(right).digest()
+    );
+};
+
+const issueSession = (user: string): string => {
+    const payload = Buffer.from(
+        JSON.stringify({ u: user, exp: Date.now() + SESSION_TTL_MS })
+    ).toString('base64url');
+    return `${payload}.${signPayload(payload)}`;
+};
+
+const readSession = (token: string | undefined): string | undefined => {
+    if (!token || !appPassword) {
+        return undefined;
+    }
+    const separator = token.lastIndexOf('.');
+    if (separator <= 0) {
+        return undefined;
+    }
+    const payload = token.slice(0, separator);
+    if (!secretsMatch(token.slice(separator + 1), signPayload(payload))) {
+        return undefined;
+    }
+    try {
+        const { u, exp } = JSON.parse(
+            Buffer.from(payload, 'base64url').toString('utf8')
+        ) as { u?: unknown; exp?: unknown };
+        if (typeof u !== 'string' || typeof exp !== 'number') {
+            return undefined;
+        }
+        return exp > Date.now() ? u.toLowerCase() : undefined;
+    } catch {
+        return undefined;
+    }
+};
+
+const readCookie = (req: http.IncomingMessage, name: string) =>
+    (req.headers.cookie ?? '')
+        .split(';')
+        .map((part) => part.trim())
+        .find((part) => part.startsWith(`${name}=`))
+        ?.slice(name.length + 1);
+
+// Browsers that still have the old HTTP basic credentials stay signed in.
+const readBasicAuth = (req: http.IncomingMessage): string | undefined => {
+    const header = req.headers.authorization;
+    if (!appPassword || !header?.startsWith('Basic ')) {
+        return undefined;
+    }
+    const decoded = Buffer.from(header.slice(6), 'base64').toString('utf8');
+    const separator = decoded.indexOf(':');
+    if (separator < 0) {
+        return undefined;
+    }
+    const username = decoded.slice(0, separator).toLowerCase();
+    const password = decoded.slice(separator + 1);
+    return secretsMatch(username, appUsername) &&
+        secretsMatch(password, appPassword)
+        ? username
+        : undefined;
+};
+
+const currentUser = (req: http.IncomingMessage): string | undefined =>
+    readSession(readCookie(req, SESSION_COOKIE)) ?? readBasicAuth(req);
+
+const isSecureRequest = (req: http.IncomingMessage) => {
+    const header = req.headers['x-forwarded-proto'];
+    const proto = Array.isArray(header) ? header[0] : header;
+    return (proto ?? '').split(',')[0].trim() === 'https';
+};
+
+const sessionCookie = (req: http.IncomingMessage, token: string | null) =>
+    [
+        `${SESSION_COOKIE}=${token ?? ''}`,
+        'Path=/',
+        'HttpOnly',
+        'SameSite=Lax',
+        token ? `Max-Age=${Math.floor(SESSION_TTL_MS / 1000)}` : 'Max-Age=0',
+        ...(isSecureRequest(req) ? ['Secure'] : []),
+    ].join('; ');
 
 const readJson = async (req: http.IncomingMessage): Promise<unknown> => {
     const chunks: Buffer[] = [];
@@ -251,13 +367,81 @@ type Handler = (ctx: {
     params: string[];
     url: URL;
     body: () => Promise<unknown>;
+    req: http.IncomingMessage;
+    res: http.ServerResponse;
 }) => Promise<unknown>;
 
-const routes: { method: string; pattern: RegExp; handler: Handler }[] = [];
-const route = (method: string, path: string, handler: Handler) => {
+interface Route {
+    method: string;
+    pattern: RegExp;
+    handler: Handler;
+    // Reachable without an authenticated user (the sign-in endpoints).
+    open?: boolean;
+}
+
+const routes: Route[] = [];
+const route = (
+    method: string,
+    path: string,
+    handler: Handler,
+    options: { open?: boolean } = {}
+) => {
     const pattern = new RegExp(`^${path.replace(/:[a-z]+/gi, '([^/]+)')}/?$`);
-    routes.push({ method, pattern, handler });
+    routes.push({ method, pattern, handler, ...options });
 };
+
+// ---------- Sign in / sign out ----------
+
+// nginx asks this for every request (auth_request) and passes the answer on as
+// X-Forwarded-User.
+route(
+    'GET',
+    '/api/auth/verify',
+    async ({ req, res }) => {
+        const user = currentUser(req) ?? devUser;
+        if (!user) {
+            throw new HttpError(401, 'Not authenticated');
+        }
+        res.writeHead(204, { 'X-Auth-User': user.toLowerCase() }).end();
+    },
+    { open: true }
+);
+
+route(
+    'POST',
+    '/api/auth/login',
+    async ({ body, req, res }) => {
+        const { password } = requireObject(await body(), 'body');
+        const valid =
+            !!appPassword &&
+            typeof password === 'string' &&
+            secretsMatch(password, appPassword);
+
+        if (!valid) {
+            // Slow down password guessing without keeping any state.
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            throw new HttpError(401, 'Incorrect password');
+        }
+
+        res.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store',
+            'Set-Cookie': sessionCookie(req, issueSession(appUsername)),
+        }).end(JSON.stringify({ user: appUsername }));
+    },
+    { open: true }
+);
+
+route(
+    'POST',
+    '/api/auth/logout',
+    async ({ req, res }) => {
+        res.writeHead(204, {
+            'Set-Cookie': sessionCookie(req, null),
+        }).end();
+    },
+    { open: true }
+);
 
 route('GET', '/api/me', async ({ user }) => ({ user }));
 
@@ -513,24 +697,31 @@ const send = (res: http.ServerResponse, status: number, payload?: unknown) => {
 const server = http.createServer(async (req, res) => {
     const url = new URL(req.url ?? '/', 'http://localhost');
     try {
-        const user = authenticate(req);
         const path = decodeURI(url.pathname);
-        for (const { method, pattern, handler } of routes) {
+        for (const { method, pattern, handler, open } of routes) {
             const match = method === req.method ? pattern.exec(path) : null;
             if (!match) continue;
             const params = match.slice(1).map(decodeURIComponent);
             const result = await handler({
-                user,
+                user: open ? '' : authenticate(req),
                 params,
                 url,
                 body: () => readJson(req),
+                req,
+                res,
             });
-            send(res, 200, result);
+            // Handlers that need custom headers answer the request themselves.
+            if (!res.headersSent) {
+                send(res, 200, result);
+            }
             return;
         }
         throw new HttpError(404, 'Not found');
     } catch (error) {
-        if (error instanceof HttpError) {
+        if (res.headersSent) {
+            console.error(`${req.method} ${url.pathname} failed late`, error);
+            res.end();
+        } else if (error instanceof HttpError) {
             send(res, error.status, { error: error.message });
         } else if ((error as { code?: string }).code === '23505') {
             send(res, 409, { error: 'Already exists' });

@@ -4,13 +4,46 @@ server {
 
     root   /usr/share/nginx/html;
 
-    # Shared team password for everything except the health check.
-    auth_basic           "ChartDB";
-    auth_basic_user_file /etc/nginx/htpasswd;
+    # Keep redirects relative: nginx only sees the container's port and plain
+    # HTTP, so an absolute Location would send users to the wrong URL.
+    absolute_redirect off;
+
+    # Every request is checked against the API, which accepts a signed session
+    # cookie (set once at /login.html, good for a year) or the old HTTP basic
+    # credentials. Only the login page and the health check are open.
+    auth_request     /_auth;
+    auth_request_set $auth_user $upstream_http_x_auth_user;
+
+    location = /_auth {
+        internal;
+        proxy_pass              http://127.0.0.1:${API_PORT}/api/auth/verify;
+        proxy_http_version      1.1;
+        proxy_pass_request_body off;
+        proxy_set_header        Content-Length "";
+    }
 
     location / {
+        # Send signed-out browsers to the login page instead of a bare 401.
+        error_page 401 = @login;
         index  index.html index.htm;
 	    try_files  $uri $uri/ /index.html;
+    }
+
+    location @login {
+        auth_request off;
+        return 302 /login.html?next=$request_uri;
+    }
+
+    location = /login.html {
+        auth_request off;
+        add_header Cache-Control "no-store";
+    }
+
+    # Issues and clears the session cookie, so it cannot require one itself.
+    location /api/auth/ {
+        auth_request off;
+        proxy_pass http://127.0.0.1:${API_PORT};
+        proxy_http_version 1.1;
     }
 
     location /api/ {
@@ -28,7 +61,7 @@ server {
     }
 
     location = /ping {
-        auth_basic off;
+        auth_request off;
         default_type text/plain;
         return 200 "OK";
     }

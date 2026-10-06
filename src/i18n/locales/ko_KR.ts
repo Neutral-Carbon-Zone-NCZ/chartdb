@@ -21,6 +21,7 @@ export const ko_KR: LanguageTranslation = {
                 export_sql: 'SQL로 저장',
                 export_as: '다른 형식으로 저장',
                 delete_diagram: '삭제',
+                logout: 'Log out',
             },
             edit: {
                 edit: '편집',
@@ -44,6 +45,8 @@ export const ko_KR: LanguageTranslation = {
                 // TODO: Translate
                 show_minimap: 'Show Mini Map',
                 hide_minimap: 'Hide Mini Map',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
             backup: {
                 backup: '백업',
@@ -153,6 +156,7 @@ export const ko_KR: LanguageTranslation = {
                         comments: '주석',
                         no_comments: '주석 없음',
                         delete_field: '필드 삭제',
+                        is_new: 'New',
                         // TODO: Translate
                         default_value: 'Default Value',
                         no_default: 'No default',
@@ -529,6 +533,8 @@ export const ko_KR: LanguageTranslation = {
             add_relationship: 'Add Relationship', // TODO: Translate
             move_to_area: '영역으로 이동',
             no_area: '영역 없음',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -546,6 +552,8 @@ export const ko_KR: LanguageTranslation = {
             no_tables_description: '검색 또는 필터를 조정해 보세요',
             clear_filter: '필터 지우기',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         snap_to_grid_tooltip: '그리드에 맞추기 ({{key}}를 누른채 유지)',

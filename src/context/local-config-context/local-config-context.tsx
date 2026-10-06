@@ -28,6 +28,10 @@ export interface LocalConfigContext {
 
     showMiniMapOnCanvas: boolean;
     setShowMiniMapOnCanvas: (showMiniMapOnCanvas: boolean) => void;
+
+    // Tints schemas, tables and columns marked as new on the canvas.
+    highlightNew: boolean;
+    setHighlightNew: (highlightNew: boolean) => void;
 }
 
 export const LocalConfigContext = createContext<LocalConfigContext>({
@@ -54,4 +58,7 @@ export const LocalConfigContext = createContext<LocalConfigContext>({
 
     showMiniMapOnCanvas: false,
     setShowMiniMapOnCanvas: emptyFn,
+
+    highlightNew: true,
+    setHighlightNew: emptyFn,
 });

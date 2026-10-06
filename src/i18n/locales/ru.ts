@@ -21,6 +21,7 @@ export const ru: LanguageTranslation = {
                 export_sql: 'Экспорт SQL',
                 export_as: 'Экспортировать как',
                 delete_diagram: 'Удалить',
+                logout: 'Log out',
             },
             edit: {
                 edit: 'Изменение',
@@ -43,6 +44,8 @@ export const ru: LanguageTranslation = {
                 hide_dependencies: 'Скрыть зависимости',
                 show_minimap: 'Показать мини-карту',
                 hide_minimap: 'Скрыть мини-карту',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
             backup: {
                 backup: 'Бэкап',
@@ -151,6 +154,7 @@ export const ru: LanguageTranslation = {
                         comments: 'Комментарии',
                         no_comments: 'Нет комментария',
                         delete_field: 'Удалить поле',
+                        is_new: 'New',
                         // TODO: Translate
                         default_value: 'Default Value',
                         no_default: 'No default',
@@ -531,6 +535,8 @@ export const ru: LanguageTranslation = {
             add_relationship: 'Добавить связь',
             move_to_area: 'Переместить в область',
             no_area: 'Без области',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -548,6 +554,8 @@ export const ru: LanguageTranslation = {
             no_tables_description: 'Попробуйте изменить поиск или фильтр',
             clear_filter: 'Очистить фильтр',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         copy_to_clipboard: 'Скопировать в буфер обмена',

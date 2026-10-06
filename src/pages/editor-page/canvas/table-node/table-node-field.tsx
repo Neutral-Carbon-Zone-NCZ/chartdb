@@ -70,6 +70,7 @@ const arePropsEqual = (
         prevProps.field.precision === nextProps.field.precision &&
         prevProps.field.scale === nextProps.field.scale &&
         prevProps.field.isArray === nextProps.field.isArray &&
+        prevProps.field.isNew === nextProps.field.isNew &&
         prevProps.focused === nextProps.focused &&
         prevProps.highlighted === nextProps.highlighted &&
         prevProps.visible === nextProps.visible &&
@@ -321,7 +322,12 @@ export const TableNodeField: React.FC<TableNodeFieldProps> = React.memo(
             if (!highlightedCustomType) return false;
             return field.type.name === highlightedCustomType.name;
         }, [highlightedCustomType, field.type.name]);
-        const { showFieldAttributes } = useLocalConfig();
+        const { showFieldAttributes, highlightNew } = useLocalConfig();
+        // Light green fill for columns the team marked as not yet built.
+        const markedNew = useMemo(
+            () => highlightNew && !!field.isNew,
+            [highlightNew, field.isNew]
+        );
 
         const { closeAllTablesInSidebar } = useLayout();
         const { setEditTableModeTable } = useCanvas();
@@ -349,6 +355,8 @@ export const TableNodeField: React.FC<TableNodeFieldProps> = React.memo(
                     'group relative flex h-8 items-center justify-between gap-1 border-t px-3 text-sm last:rounded-b-[6px] hover:bg-slate-100 dark:hover:bg-slate-800',
                     'transition-all duration-200 ease-in-out',
                     {
+                        'bg-green-500/15 hover:bg-green-500/20 dark:bg-green-400/15 dark:hover:bg-green-400/20':
+                            markedNew,
                         'bg-pink-100 dark:bg-pink-900':
                             highlighted && !isCustomTypeHighlighted,
                         'bg-yellow-100 dark:bg-yellow-900':

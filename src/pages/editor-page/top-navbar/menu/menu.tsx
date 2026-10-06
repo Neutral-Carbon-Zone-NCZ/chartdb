@@ -61,6 +61,8 @@ export const Menu: React.FC<MenuProps> = () => {
         showMiniMapOnCanvas,
         showDBViews,
         setShowDBViews,
+        highlightNew,
+        setHighlightNew,
     } = useLocalConfig();
     const { t } = useTranslation();
     const { redo, undo, hasRedo, hasUndo } = useHistory();
@@ -141,9 +143,22 @@ export const Menu: React.FC<MenuProps> = () => {
         setShowFieldAttributes(!showFieldAttributes);
     }, [showFieldAttributes, setShowFieldAttributes]);
 
+    // Clear the session cookie, then let nginx bounce us to the login page.
+    const logout = useCallback(async () => {
+        await fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'same-origin',
+        }).catch(() => undefined);
+        window.location.href = '/login.html';
+    }, []);
+
     const showOrHideMiniMap = useCallback(() => {
         setShowMiniMapOnCanvas(!showMiniMapOnCanvas);
     }, [showMiniMapOnCanvas, setShowMiniMapOnCanvas]);
+
+    const showOrHideNewHighlight = useCallback(() => {
+        setHighlightNew(!highlightNew);
+    }, [highlightNew, setHighlightNew]);
 
     const emojiAI = '✨';
 
@@ -323,6 +338,10 @@ export const Menu: React.FC<MenuProps> = () => {
                     >
                         {t('menu.actions.delete_diagram')}
                     </MenubarItem>
+                    <MenubarSeparator />
+                    <MenubarItem onClick={logout}>
+                        {t('menu.actions.logout')}
+                    </MenubarItem>
                 </MenubarContent>
             </MenubarMenu>
             <MenubarMenu>
@@ -396,6 +415,11 @@ export const Menu: React.FC<MenuProps> = () => {
                         {showMiniMapOnCanvas
                             ? t('menu.view.hide_minimap')
                             : t('menu.view.show_minimap')}
+                    </MenubarItem>
+                    <MenubarItem onClick={showOrHideNewHighlight}>
+                        {highlightNew
+                            ? t('menu.view.hide_highlight_new')
+                            : t('menu.view.highlight_new')}
                     </MenubarItem>
                     <MenubarSeparator />
                     <MenubarSub>

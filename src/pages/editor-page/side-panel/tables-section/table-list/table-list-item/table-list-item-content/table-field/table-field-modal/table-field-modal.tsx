@@ -111,6 +111,7 @@ export const TableFieldPopover: React.FC<TableFieldPopoverProps> = ({
                 default: localField.default,
                 increment: localField.increment,
                 isArray: localField.isArray,
+                isNew: localField.isNew,
             });
         }
         prevFieldRef.current = localField;
@@ -183,6 +184,23 @@ export const TableFieldPopover: React.FC<TableFieldPopoverProps> = ({
                                     setLocalField((current) => ({
                                         ...current,
                                         unique: !!value,
+                                    }))
+                                }
+                            />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <Label htmlFor="isNew" className="text-subtitle">
+                                {t(
+                                    'side_panel.tables_section.table.field_actions.is_new'
+                                )}
+                            </Label>
+                            <Checkbox
+                                checked={localField.isNew ?? false}
+                                disabled={readonly}
+                                onCheckedChange={(value) =>
+                                    setLocalField((current) => ({
+                                        ...current,
+                                        isNew: !!value,
                                     }))
                                 }
                             />

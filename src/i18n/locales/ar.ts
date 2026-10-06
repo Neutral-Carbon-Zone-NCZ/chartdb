@@ -21,6 +21,7 @@ export const ar: LanguageTranslation = {
                 export_sql: 'SQL تصدير',
                 export_as: 'تصدير كـ',
                 delete_diagram: 'حذف',
+                logout: 'Log out',
             },
             edit: {
                 edit: 'تحرير',
@@ -44,6 +45,8 @@ export const ar: LanguageTranslation = {
                 // TODO: Translate
                 show_minimap: 'Show Mini Map',
                 hide_minimap: 'Hide Mini Map',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
             backup: {
                 backup: 'النسخ الاحتياطي',
@@ -153,6 +156,7 @@ export const ar: LanguageTranslation = {
                         comments: 'تعليقات',
                         no_comments: 'لا يوجد تعليقات',
                         delete_field: 'حذف الحقل',
+                        is_new: 'New',
                         // TODO: Translate
                         character_length: 'Max Length',
                         precision: 'الدقة',
@@ -524,6 +528,8 @@ export const ar: LanguageTranslation = {
             add_relationship: 'Add Relationship', // TODO: Translate
             move_to_area: 'نقل إلى منطقة',
             no_area: 'بدون منطقة',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -541,6 +547,8 @@ export const ar: LanguageTranslation = {
             no_tables_description: 'جرب تعديل البحث أو التصفية',
             clear_filter: 'مسح التصفية',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         snap_to_grid_tooltip: '({{key}} مغنظة الشبكة (اضغط مع الاستمرار على',

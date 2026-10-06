@@ -7,6 +7,8 @@ export type SchemaContext = {
     tableIds: string[];
     // Shared color of the schema's tables; undefined when they differ.
     color?: string;
+    // Every table in the schema is marked as new.
+    allNew: boolean;
 };
 export type AreaContext = {
     id: string;
@@ -32,4 +34,5 @@ export type RelevantTableData = {
     parentAreaId?: string | null;
     isView?: boolean;
     color?: string;
+    isNew?: boolean | null;
 };

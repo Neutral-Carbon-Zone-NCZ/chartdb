@@ -24,6 +24,8 @@ export interface DBField {
     collation?: string | null;
     comments?: string | null;
     check?: string | null;
+    // Marked by the team as not existing in the current database build.
+    isNew?: boolean | null;
 }
 
 export const dbFieldSchema: z.ZodType<DBField> = z.object({
@@ -43,6 +45,7 @@ export const dbFieldSchema: z.ZodType<DBField> = z.object({
     collation: z.string().or(z.null()).optional(),
     comments: z.string().or(z.null()).optional(),
     check: z.string().or(z.null()).optional(),
+    isNew: z.boolean().or(z.null()).optional(),
 });
 
 export const generateDBFieldSuffix = (

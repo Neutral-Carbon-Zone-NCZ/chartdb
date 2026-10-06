@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, EyeOff, CircleDotDashed } from 'lucide-react';
+import { Eye, EyeOff, CircleDotDashed, Sparkles } from 'lucide-react';
 import { Button } from '@/components/button/button';
 import type { TreeNode } from '@/components/tree-view/tree';
 import { schemaNameToSchemaId } from '@/lib/domain/db-schema';
@@ -22,6 +22,8 @@ interface FilterItemActionsProps {
     databaseWithSchemas: boolean;
     // Omitted in read-only mode.
     setTablesColor?: (tableIds: string[], color: string) => void;
+    // Omitted in read-only mode.
+    setTablesNew?: (tableIds: string[], isNew: boolean) => void;
     toggleSchemaFilter: (schemaId: string) => void;
     toggleTableFilter: (tableId: string) => void;
     clearTableIdsFilter: () => void;
@@ -40,6 +42,7 @@ export const FilterItemActions: React.FC<FilterItemActionsProps> = ({
     node,
     databaseWithSchemas,
     setTablesColor,
+    setTablesNew,
     toggleSchemaFilter,
     toggleTableFilter,
     clearTableIdsFilter,
@@ -69,6 +72,31 @@ export const FilterItemActions: React.FC<FilterItemActionsProps> = ({
                             title={t('canvas_filter.schema_color')}
                         />
                     </div>
+                )}
+                {setTablesNew && context.tableIds.length > 0 && (
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-fit w-6 p-0"
+                        title={
+                            context.allNew
+                                ? t('canvas_filter.schema_unmark_new')
+                                : t('canvas_filter.schema_mark_new')
+                        }
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setTablesNew(context.tableIds, !context.allNew);
+                        }}
+                    >
+                        <Sparkles
+                            className={cn(
+                                '!size-3.5',
+                                context.allNew
+                                    ? 'text-green-600 dark:text-green-400'
+                                    : 'text-muted-foreground'
+                            )}
+                        />
+                    </Button>
                 )}
                 <Button
                     variant="ghost"

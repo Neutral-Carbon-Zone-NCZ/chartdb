@@ -11,6 +11,7 @@ const githubRepoOpenedKey = 'github_repo_opened';
 const starUsDialogLastOpenKey = 'star_us_dialog_last_open';
 const showMiniMapOnCanvasKey = 'show_minimap_on_canvas';
 const showDBViewsKey = 'show_db_views';
+const highlightNewKey = 'highlight_new';
 
 export const LocalConfigProvider: React.FC<React.PropsWithChildren> = ({
     children,
@@ -49,6 +50,14 @@ export const LocalConfigProvider: React.FC<React.PropsWithChildren> = ({
         React.useState<boolean>(
             (localStorage.getItem(showMiniMapOnCanvasKey) || 'true') === 'true'
         );
+
+    const [highlightNew, setHighlightNew] = React.useState<boolean>(
+        (localStorage.getItem(highlightNewKey) || 'true') === 'true'
+    );
+
+    useEffect(() => {
+        localStorage.setItem(highlightNewKey, highlightNew.toString());
+    }, [highlightNew]);
 
     useEffect(() => {
         localStorage.setItem(
@@ -103,6 +112,8 @@ export const LocalConfigProvider: React.FC<React.PropsWithChildren> = ({
                 setStarUsDialogLastOpen,
                 showMiniMapOnCanvas,
                 setShowMiniMapOnCanvas,
+                highlightNew,
+                setHighlightNew,
             }}
         >
             {children}

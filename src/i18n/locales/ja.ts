@@ -21,6 +21,7 @@ export const ja: LanguageTranslation = {
                 export_sql: 'SQLをエクスポート',
                 export_as: '形式を指定してエクスポート',
                 delete_diagram: '削除',
+                logout: 'Log out',
             },
             edit: {
                 edit: '編集',
@@ -45,6 +46,8 @@ export const ja: LanguageTranslation = {
                 // TODO: Translate
                 show_minimap: 'Show Mini Map',
                 hide_minimap: 'Hide Mini Map',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
             backup: {
                 backup: 'バックアップ',
@@ -156,6 +159,7 @@ export const ja: LanguageTranslation = {
                         comments: 'コメント',
                         no_comments: 'コメントがありません',
                         delete_field: 'フィールドを削除',
+                        is_new: 'New',
                         // TODO: Translate
                         default_value: 'Default Value',
                         no_default: 'No default',
@@ -536,6 +540,8 @@ export const ja: LanguageTranslation = {
             add_relationship: 'Add Relationship', // TODO: Translate
             move_to_area: 'エリアに移動',
             no_area: 'エリアなし',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -553,6 +559,8 @@ export const ja: LanguageTranslation = {
             no_tables_description: '検索またはフィルターを調整してください',
             clear_filter: 'フィルターをクリア',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         // TODO: Add translations

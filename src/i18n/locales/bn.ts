@@ -21,6 +21,7 @@ export const bn: LanguageTranslation = {
                 export_sql: 'SQL রপ্তানি করুন',
                 export_as: 'রূপে রপ্তানি করুন',
                 delete_diagram: 'মুছুন',
+                logout: 'Log out',
             },
             edit: {
                 edit: 'সম্পাদনা',
@@ -44,6 +45,8 @@ export const bn: LanguageTranslation = {
                 // TODO: Translate
                 show_minimap: 'Show Mini Map',
                 hide_minimap: 'Hide Mini Map',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
 
             backup: {
@@ -154,6 +157,7 @@ export const bn: LanguageTranslation = {
                         comments: 'মন্তব্য',
                         no_comments: 'কোনো মন্তব্য নেই',
                         delete_field: 'ফিল্ড মুছুন',
+                        is_new: 'New',
                         // TODO: Translate
                         default_value: 'Default Value',
                         no_default: 'No default',
@@ -535,6 +539,8 @@ export const bn: LanguageTranslation = {
             add_relationship: 'Add Relationship', // TODO: Translate
             move_to_area: 'এলাকায় সরান',
             no_area: 'কোনো এলাকা নেই',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -552,6 +558,8 @@ export const bn: LanguageTranslation = {
             no_tables_description: 'আপনার অনুসন্ধান বা ফিল্টার সামঞ্জস্য করুন',
             clear_filter: 'ফিল্টার মুছুন',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         snap_to_grid_tooltip: 'গ্রিডে স্ন্যাপ করুন (অবস্থান {{key}})',

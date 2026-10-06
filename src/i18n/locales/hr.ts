@@ -21,6 +21,7 @@ export const hr: LanguageTranslation = {
                 export_sql: 'Izvezi SQL',
                 export_as: 'Izvezi kao',
                 delete_diagram: 'Izbriši',
+                logout: 'Log out',
             },
             edit: {
                 edit: 'Uredi',
@@ -43,6 +44,8 @@ export const hr: LanguageTranslation = {
                 hide_dependencies: 'Sakrij ovisnosti',
                 show_minimap: 'Prikaži mini kartu',
                 hide_minimap: 'Sakrij mini kartu',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
             backup: {
                 backup: 'Sigurnosna kopija',
@@ -156,6 +159,7 @@ export const hr: LanguageTranslation = {
                         default_value: 'Zadana vrijednost',
                         no_default: 'Nema zadane vrijednosti',
                         delete_field: 'Izbriši polje',
+                        is_new: 'New',
                     },
                     index_actions: {
                         title: 'Atributi indeksa',
@@ -527,6 +531,8 @@ export const hr: LanguageTranslation = {
             add_relationship: 'Dodaj vezu',
             move_to_area: 'Premjesti u područje',
             no_area: 'Bez područja',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -544,6 +550,8 @@ export const hr: LanguageTranslation = {
             no_tables_description: 'Pokušajte prilagoditi pretragu ili filter',
             clear_filter: 'Očisti filter',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         snap_to_grid_tooltip: 'Priljepljivanje na mrežu (Drži {{key}})',

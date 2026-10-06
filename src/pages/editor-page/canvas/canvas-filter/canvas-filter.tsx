@@ -69,6 +69,7 @@ export const CanvasFilter: React.FC<CanvasFilterProps> = ({ onClose }) => {
                     parentAreaId: table.parentAreaId,
                     isView: table.isView,
                     color: table.color,
+                    isNew: table.isNew,
                 })),
         [tables, showDBViews, checkIfNewTable]
     );
@@ -189,6 +190,21 @@ export const CanvasFilter: React.FC<CanvasFilterProps> = ({ onClose }) => {
         [updateTablesState]
     );
 
+    // Mark or unmark every table in a schema as new, as a single undo step
+    const setTablesNew = useCallback(
+        (tableIds: string[], isNew: boolean) => {
+            const ids = new Set(tableIds);
+            updateTablesState(
+                (currentTables) =>
+                    currentTables.map((table) =>
+                        ids.has(table.id) ? { id: table.id, isNew } : table
+                    ),
+                { updateHistory: true }
+            );
+        },
+        [updateTablesState]
+    );
+
     // Render actions with proper memoization for performance
     const renderActions = useCallback(
         (node: TreeNode<NodeType, NodeContext>) => (
@@ -196,6 +212,7 @@ export const CanvasFilter: React.FC<CanvasFilterProps> = ({ onClose }) => {
                 node={node}
                 databaseWithSchemas={databaseWithSchemas}
                 setTablesColor={readonly ? undefined : setTablesColor}
+                setTablesNew={readonly ? undefined : setTablesNew}
                 toggleSchemaFilter={toggleSchemaFilter}
                 toggleTableFilter={toggleTableFilter}
                 clearTableIdsFilter={clearTableIdsFilter}
@@ -208,6 +225,7 @@ export const CanvasFilter: React.FC<CanvasFilterProps> = ({ onClose }) => {
             databaseWithSchemas,
             readonly,
             setTablesColor,
+            setTablesNew,
             toggleSchemaFilter,
             toggleTableFilter,
             clearTableIdsFilter,

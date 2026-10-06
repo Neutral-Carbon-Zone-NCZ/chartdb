@@ -21,6 +21,7 @@ export const te: LanguageTranslation = {
                 export_sql: 'SQL ఎగుమతి',
                 export_as: 'వగా ఎగుమతి చేయండి',
                 delete_diagram: 'తొలగించండి',
+                logout: 'Log out',
             },
             edit: {
                 edit: 'సవరించు',
@@ -44,6 +45,8 @@ export const te: LanguageTranslation = {
                 // TODO: Translate
                 show_minimap: 'Show Mini Map',
                 hide_minimap: 'Hide Mini Map',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
             // TODO: Translate
             backup: {
@@ -154,6 +157,7 @@ export const te: LanguageTranslation = {
                         comments: 'వ్యాఖ్యలు',
                         no_comments: 'వ్యాఖ్యలు లేవు',
                         delete_field: 'ఫీల్డ్ తొలగించు',
+                        is_new: 'New',
                         // TODO: Translate
                         default_value: 'Default Value',
                         no_default: 'No default',
@@ -538,6 +542,8 @@ export const te: LanguageTranslation = {
             add_relationship: 'Add Relationship', // TODO: Translate
             move_to_area: 'ప్రాంతానికి తరలించు',
             no_area: 'ప్రాంతం లేదు',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -556,6 +562,8 @@ export const te: LanguageTranslation = {
                 'మీ శోధన లేదా ఫిల్టర్‌ను సర్దుబాటు చేయడానికి ప్రయత్నించండి',
             clear_filter: 'ఫిల్టర్ క్లియర్ చేయండి',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         // TODO: Translate

@@ -21,6 +21,7 @@ export const fr: LanguageTranslation = {
                 export_sql: 'Exporter SQL',
                 export_as: 'Exporter en tant que',
                 delete_diagram: 'Supprimer',
+                logout: 'Log out',
             },
             edit: {
                 edit: 'Édition',
@@ -43,6 +44,8 @@ export const fr: LanguageTranslation = {
                 hide_dependencies: 'Masquer les Dépendances',
                 show_minimap: 'Afficher la Mini Carte',
                 hide_minimap: 'Masquer la Mini Carte',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
             backup: {
                 backup: 'Sauvegarde',
@@ -151,6 +154,7 @@ export const fr: LanguageTranslation = {
                         comments: 'Commentaires',
                         no_comments: 'Pas de commentaires',
                         delete_field: 'Supprimer le Champ',
+                        is_new: 'New',
                         // TODO: Translate
                         default_value: 'Default Value',
                         no_default: 'No default',
@@ -530,6 +534,8 @@ export const fr: LanguageTranslation = {
             add_relationship: 'Ajouter une Relation',
             move_to_area: 'Déplacer vers une Zone',
             no_area: 'Aucune Zone',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -548,6 +554,8 @@ export const fr: LanguageTranslation = {
                 'Essayez de modifier votre recherche ou filtre',
             clear_filter: 'Effacer le filtre',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         snap_to_grid_tooltip:

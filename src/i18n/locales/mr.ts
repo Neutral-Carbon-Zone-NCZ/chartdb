@@ -21,6 +21,7 @@ export const mr: LanguageTranslation = {
                 export_sql: 'SQL एक्स्पोर्ट करा',
                 export_as: 'म्हणून एक्स्पोर्ट करा',
                 delete_diagram: 'हटवा',
+                logout: 'Log out',
             },
             edit: {
                 edit: 'संपादन करा',
@@ -44,6 +45,8 @@ export const mr: LanguageTranslation = {
                 // TODO: Translate
                 show_minimap: 'Show Mini Map',
                 hide_minimap: 'Hide Mini Map',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
             backup: {
                 // TODO: Add translations
@@ -156,6 +159,7 @@ export const mr: LanguageTranslation = {
                         comments: 'टिप्पण्या',
                         no_comments: 'कोणत्याही टिप्पणी नाहीत',
                         delete_field: 'फील्ड हटवा',
+                        is_new: 'New',
                         // TODO: Translate
                         default_value: 'Default Value',
                         no_default: 'No default',
@@ -543,6 +547,8 @@ export const mr: LanguageTranslation = {
             add_relationship: 'Add Relationship', // TODO: Translate
             move_to_area: 'क्षेत्रात हलवा',
             no_area: 'क्षेत्र नाही',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -561,6 +567,8 @@ export const mr: LanguageTranslation = {
                 'तुमची शोध किंवा फिल्टर समायोजित करण्याचा प्रयत्न करा',
             clear_filter: 'फिल्टर साफ करा',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         // TODO: Add translations

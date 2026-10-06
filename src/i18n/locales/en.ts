@@ -21,6 +21,7 @@ export const en = {
                 export_sql: 'Export SQL',
                 export_as: 'Export as',
                 delete_diagram: 'Delete',
+                logout: 'Log out',
             },
             edit: {
                 edit: 'Edit',
@@ -43,6 +44,8 @@ export const en = {
                 hide_dependencies: 'Hide Dependencies',
                 show_minimap: 'Show Mini Map',
                 hide_minimap: 'Hide Mini Map',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
             backup: {
                 backup: 'Backup',
@@ -155,6 +158,7 @@ export const en = {
                         default_value: 'Default Value',
                         no_default: 'No default',
                         delete_field: 'Delete Field',
+                        is_new: 'New',
                     },
                     index_actions: {
                         title: 'Index Attributes',
@@ -522,6 +526,8 @@ export const en = {
             add_relationship: 'Add Relationship',
             move_to_area: 'Move to Area',
             no_area: 'No Area',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -539,6 +545,8 @@ export const en = {
             no_tables_description: 'Try adjusting your search or filter',
             clear_filter: 'Clear filter',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         snap_to_grid_tooltip: 'Snap to Grid (Hold {{key}})',

@@ -53,6 +53,7 @@ import { useDiff } from '@/context/diff-context/use-diff';
 import { TableNodeStatus } from './table-node-status/table-node-status';
 import { TableEditMode } from './table-edit-mode/table-edit-mode';
 import { useCanvas } from '@/hooks/use-canvas';
+import { useLocalConfig } from '@/hooks/use-local-config';
 
 export const TABLE_RELATIONSHIP_SOURCE_HANDLE_ID_PREFIX = 'table_rel_source_';
 export const TABLE_RELATIONSHIP_TARGET_HANDLE_ID_PREFIX = 'table_rel_target_';
@@ -117,6 +118,13 @@ export const TableNode: React.FC<NodeProps<TableNodeType>> = React.memo(
         // Store the initial field count when entering edit mode to keep table height fixed
         const [editModeInitialFieldCount, setEditModeInitialFieldCount] =
             useState<number | null>(null);
+
+        const { highlightNew } = useLocalConfig();
+        // Light green fill for content the team marked as not yet built.
+        const markedNew = useMemo(
+            () => highlightNew && !!table.isNew,
+            [highlightNew, table.isNew]
+        );
 
         const connection = useConnection();
 
@@ -348,6 +356,7 @@ export const TableNode: React.FC<NodeProps<TableNodeType>> = React.memo(
             () =>
                 cn(
                     'flex w-full flex-col border-2 bg-slate-50 dark:bg-slate-950 rounded-lg shadow-sm transition-transform duration-300',
+                    markedNew ? 'bg-green-100/70 dark:bg-green-900/40' : '',
                     table.isView ? 'border-dashed' : '',
                     selected || isTarget || isPartOfCreatingRelationship
                         ? 'border-pink-600'
@@ -396,6 +405,7 @@ export const TableNode: React.FC<NodeProps<TableNodeType>> = React.memo(
                 editTableMode,
                 isPartOfCreatingRelationship,
                 table.isView,
+                markedNew,
             ]
         );
 
@@ -507,7 +517,14 @@ export const TableNode: React.FC<NodeProps<TableNodeType>> = React.memo(
                         className="h-2 rounded-t-[6px]"
                         style={{ backgroundColor: tableColor }}
                     ></div>
-                    <div className="group flex h-9 items-center justify-between bg-slate-200 px-2 dark:bg-slate-900">
+                    <div
+                        className={cn(
+                            'group flex h-9 items-center justify-between bg-slate-200 px-2 dark:bg-slate-900',
+                            markedNew
+                                ? 'bg-green-200/70 dark:bg-green-900/60'
+                                : ''
+                        )}
+                    >
                         <div className="flex min-w-0 flex-1 items-center gap-2">
                             {isDiffNewTable ? (
                                 <Tooltip>

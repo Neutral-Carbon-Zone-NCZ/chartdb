@@ -21,6 +21,7 @@ export const zh_TW: LanguageTranslation = {
                 export_sql: '匯出 SQL',
                 export_as: '匯出為特定格式',
                 delete_diagram: '刪除',
+                logout: 'Log out',
             },
             edit: {
                 edit: '編輯',
@@ -44,6 +45,8 @@ export const zh_TW: LanguageTranslation = {
                 // TODO: Translate
                 show_minimap: 'Show Mini Map',
                 hide_minimap: 'Hide Mini Map',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
             backup: {
                 backup: '備份',
@@ -150,6 +153,7 @@ export const zh_TW: LanguageTranslation = {
                         comments: '註解',
                         no_comments: '無註解',
                         delete_field: '刪除欄位',
+                        is_new: 'New',
                         // TODO: Translate
                         default_value: 'Default Value',
                         no_default: 'No default',
@@ -522,6 +526,8 @@ export const zh_TW: LanguageTranslation = {
             add_relationship: 'Add Relationship', // TODO: Translate
             move_to_area: '移動到區域',
             no_area: '無區域',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -539,6 +545,8 @@ export const zh_TW: LanguageTranslation = {
             no_tables_description: '嘗試調整您的搜尋或篩選',
             clear_filter: '清除篩選',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         snap_to_grid_tooltip: '對齊網格（按住 {{key}}）',

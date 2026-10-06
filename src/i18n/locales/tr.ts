@@ -21,6 +21,7 @@ export const tr: LanguageTranslation = {
                 export_sql: 'SQL Olarak Dışa Aktar',
                 export_as: 'Olarak Dışa Aktar',
                 delete_diagram: 'Sil',
+                logout: 'Log out',
             },
             edit: {
                 edit: 'Düzenle',
@@ -44,6 +45,8 @@ export const tr: LanguageTranslation = {
                 // TODO: Translate
                 show_minimap: 'Show Mini Map',
                 hide_minimap: 'Hide Mini Map',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
             // TODO: Translate
             backup: {
@@ -153,6 +156,7 @@ export const tr: LanguageTranslation = {
                         comments: 'Yorumlar',
                         no_comments: 'Yorum yok',
                         delete_field: 'Alanı Sil',
+                        is_new: 'New',
                         // TODO: Translate
                         default_value: 'Default Value',
                         no_default: 'No default',
@@ -521,6 +525,8 @@ export const tr: LanguageTranslation = {
             add_relationship: 'Add Relationship', // TODO: Translate
             move_to_area: 'Alana Taşı',
             no_area: 'Alan Yok',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -539,6 +545,8 @@ export const tr: LanguageTranslation = {
                 'Aramanızı veya filtrenizi ayarlamayı deneyin',
             clear_filter: 'Filtreyi temizle',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         // TODO: Translate

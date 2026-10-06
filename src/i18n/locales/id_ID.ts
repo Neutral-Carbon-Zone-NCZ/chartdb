@@ -21,6 +21,7 @@ export const id_ID: LanguageTranslation = {
                 export_sql: 'Ekspor SQL',
                 export_as: 'Ekspor Sebagai',
                 delete_diagram: 'Hapus',
+                logout: 'Log out',
             },
             edit: {
                 edit: 'Ubah',
@@ -44,6 +45,8 @@ export const id_ID: LanguageTranslation = {
                 // TODO: Translate
                 show_minimap: 'Show Mini Map',
                 hide_minimap: 'Hide Mini Map',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
             backup: {
                 backup: 'Cadangan',
@@ -153,6 +156,7 @@ export const id_ID: LanguageTranslation = {
                         comments: 'Komentar',
                         no_comments: 'Tidak ada komentar',
                         delete_field: 'Hapus Kolom',
+                        is_new: 'New',
                         // TODO: Translate
                         default_value: 'Default Value',
                         no_default: 'No default',
@@ -533,6 +537,8 @@ export const id_ID: LanguageTranslation = {
             add_relationship: 'Add Relationship', // TODO: Translate
             move_to_area: 'Pindahkan ke Area',
             no_area: 'Tanpa Area',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -550,6 +556,8 @@ export const id_ID: LanguageTranslation = {
             no_tables_description: 'Coba sesuaikan pencarian atau filter Anda',
             clear_filter: 'Hapus filter',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         snap_to_grid_tooltip: 'Snap ke Kisi (Tahan {{key}})',

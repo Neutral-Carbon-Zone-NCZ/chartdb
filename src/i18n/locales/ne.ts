@@ -21,6 +21,7 @@ export const ne: LanguageTranslation = {
                 export_sql: 'SQL निर्यात गर्नुहोस्',
                 export_as: 'निर्यात गर्नुहोस्',
                 delete_diagram: 'हटाउनुहोस्',
+                logout: 'Log out',
             },
             edit: {
                 edit: 'सम्पादन',
@@ -44,6 +45,8 @@ export const ne: LanguageTranslation = {
                 // TODO: Translate
                 show_minimap: 'Show Mini Map',
                 hide_minimap: 'Hide Mini Map',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
             // TODO: Translate
             backup: {
@@ -154,6 +157,7 @@ export const ne: LanguageTranslation = {
                         comments: 'टिप्पणीहरू',
                         no_comments: 'कुनै टिप्पणीहरू छैनन्',
                         delete_field: 'क्षेत्र हटाउनुहोस्',
+                        is_new: 'New',
                         // TODO: Translate
                         default_value: 'Default Value',
                         no_default: 'No default',
@@ -536,6 +540,8 @@ export const ne: LanguageTranslation = {
             add_relationship: 'Add Relationship', // TODO: Translate
             move_to_area: 'क्षेत्रमा सार्नुहोस्',
             no_area: 'कुनै क्षेत्र छैन',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -554,6 +560,8 @@ export const ne: LanguageTranslation = {
                 'तपाईंको खोज वा फिल्टर समायोजन गर्ने प्रयास गर्नुहोस्',
             clear_filter: 'फिल्टर हटाउनुहोस्',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         snap_to_grid_tooltip: 'ग्रिडमा स्न्याप गर्नुहोस् ({{key}} थिच्नुहोस)',

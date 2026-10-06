@@ -214,6 +214,7 @@ export const generateTreeDataBySchemas = ({
                 visible: schemaVisible,
                 tableIds: schemaTables.map((t) => t.id),
                 color: sharedColor,
+                allNew: schemaTables.every((t) => !!t.isNew),
             } satisfies SchemaContext,
             className: !schemaVisible ? 'opacity-50' : '',
             children: createTableChildren(tablesWithVisibility),

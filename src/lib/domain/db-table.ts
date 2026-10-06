@@ -33,6 +33,8 @@ export interface DBTable {
     order?: number | null;
     expanded?: boolean | null;
     parentAreaId?: string | null;
+    // Marked by the team as not existing in the current database build.
+    isNew?: boolean | null;
 }
 
 export const dbTableSchema: z.ZodType<DBTable> = z.object({
@@ -53,6 +55,7 @@ export const dbTableSchema: z.ZodType<DBTable> = z.object({
     order: z.number().or(z.null()).optional(),
     expanded: z.boolean().or(z.null()).optional(),
     parentAreaId: z.string().or(z.null()).optional(),
+    isNew: z.boolean().or(z.null()).optional(),
 });
 
 export const generateTableKey = ({

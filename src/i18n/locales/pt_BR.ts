@@ -21,6 +21,7 @@ export const pt_BR: LanguageTranslation = {
                 export_sql: 'Exportar SQL',
                 export_as: 'Exportar como',
                 delete_diagram: 'Excluir',
+                logout: 'Log out',
             },
             edit: {
                 edit: 'Editar',
@@ -44,6 +45,8 @@ export const pt_BR: LanguageTranslation = {
                 // TODO: Translate
                 show_minimap: 'Show Mini Map',
                 hide_minimap: 'Hide Mini Map',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
             // TODO: Translate
             backup: {
@@ -154,6 +157,7 @@ export const pt_BR: LanguageTranslation = {
                         comments: 'Comentários',
                         no_comments: 'Sem comentários',
                         delete_field: 'Excluir Campo',
+                        is_new: 'New',
                         // TODO: Translate
                         default_value: 'Default Value',
                         no_default: 'No default',
@@ -535,6 +539,8 @@ export const pt_BR: LanguageTranslation = {
             add_relationship: 'Add Relationship', // TODO: Translate
             move_to_area: 'Mover para Área',
             no_area: 'Sem Área',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -552,6 +558,8 @@ export const pt_BR: LanguageTranslation = {
             no_tables_description: 'Tente ajustar sua pesquisa ou filtro',
             clear_filter: 'Limpar filtro',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         // TODO: Add translations

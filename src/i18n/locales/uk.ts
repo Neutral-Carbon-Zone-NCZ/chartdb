@@ -21,6 +21,7 @@ export const uk: LanguageTranslation = {
                 export_sql: 'Експорт SQL',
                 export_as: 'Експортувати як',
                 delete_diagram: 'Видалити',
+                logout: 'Log out',
             },
             edit: {
                 edit: 'Редагувати',
@@ -43,6 +44,8 @@ export const uk: LanguageTranslation = {
                 hide_dependencies: 'Приховати залежності',
                 show_minimap: 'Показати мінімапу',
                 hide_minimap: 'Приховати мінімапу',
+                highlight_new: 'Highlight New',
+                hide_highlight_new: 'Hide New Highlight',
             },
             backup: {
                 backup: 'Резервне копіювання',
@@ -152,6 +155,7 @@ export const uk: LanguageTranslation = {
                         comments: 'Коментарі',
                         no_comments: 'Немає коментарів',
                         delete_field: 'Видалити поле',
+                        is_new: 'New',
                         // TODO: Translate
                         default_value: 'Default Value',
                         no_default: 'No default',
@@ -531,6 +535,8 @@ export const uk: LanguageTranslation = {
             add_relationship: 'Add Relationship', // TODO: Translate
             move_to_area: 'Перемістити в область',
             no_area: 'Без області',
+            mark_as_new: 'Mark as New',
+            unmark_as_new: 'Unmark as New',
         },
 
         canvas: {
@@ -548,6 +554,8 @@ export const uk: LanguageTranslation = {
             no_tables_description: 'Спробуйте налаштувати пошук або фільтр',
             clear_filter: 'Очистити фільтр',
             schema_color: 'Change color of all tables in schema',
+            schema_mark_new: 'Mark all tables in schema as new',
+            schema_unmark_new: 'Unmark all tables in schema as new',
         },
 
         snap_to_grid_tooltip: 'Вирівнювати за сіткою (Отримуйте {{key}})',

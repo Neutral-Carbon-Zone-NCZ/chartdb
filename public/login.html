@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <title>Sign in · ChartDB</title>
+        <style>
+            :root {
+                color-scheme: light dark;
+                --bg: #f8fafc;
+                --card: #ffffff;
+                --border: #e2e8f0;
+                --text: #0f172a;
+                --muted: #64748b;
+                --accent: #db2777;
+                --error: #b91c1c;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --bg: #020617;
+                    --card: #0f172a;
+                    --border: #1e293b;
+                    --text: #e2e8f0;
+                    --muted: #94a3b8;
+                    --accent: #db2777;
+                    --error: #f87171;
+                }
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1.5rem;
+                background: var(--bg);
+                color: var(--text);
+                font-family:
+                    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+                    sans-serif;
+            }
+            form {
+                width: 100%;
+                max-width: 22rem;
+                padding: 1.75rem;
+                border: 1px solid var(--border);
+                border-radius: 0.75rem;
+                background: var(--card);
+                box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+            }
+            h1 {
+                margin: 0 0 0.25rem;
+                font-size: 1.125rem;
+            }
+            p {
+                margin: 0 0 1.25rem;
+                font-size: 0.8125rem;
+                color: var(--muted);
+            }
+            label {
+                display: block;
+                margin-bottom: 0.375rem;
+                font-size: 0.8125rem;
+                font-weight: 500;
+            }
+            input {
+                width: 100%;
+                height: 2.25rem;
+                padding: 0 0.625rem;
+                border: 1px solid var(--border);
+                border-radius: 0.375rem;
+                background: var(--bg);
+                color: inherit;
+                font-size: 0.875rem;
+            }
+            input:focus-visible {
+                outline: 2px solid var(--accent);
+                outline-offset: 1px;
+            }
+            button {
+                width: 100%;
+                height: 2.25rem;
+                margin-top: 1rem;
+                border: 0;
+                border-radius: 0.375rem;
+                background: var(--accent);
+                color: #fff;
+                font-size: 0.875rem;
+                font-weight: 500;
+                cursor: pointer;
+            }
+            button[disabled] {
+                opacity: 0.6;
+                cursor: progress;
+            }
+            .error {
+                margin: 0.75rem 0 0;
+                font-size: 0.8125rem;
+                color: var(--error);
+            }
+            [hidden] {
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <form id="login" autocomplete="on">
+            <h1>ChartDB</h1>
+            <p>Enter the team password. You will stay signed in on this
+                browser.</p>
+            <label for="password">Password</label>
+            <input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+                autofocus
+            />
+            <button id="submit" type="submit">Sign in</button>
+            <p class="error" id="error" hidden></p>
+        </form>
+        <script>
+            // nginx redirects here with ?next=<original path>, unencoded.
+            const raw = location.search.startsWith('?next=')
+                ? location.search.slice('?next='.length)
+                : '';
+            // Only same-site absolute paths, so the page cannot be used as an
+            // open redirect.
+            const next = /^\/($|[^/])/.test(raw) ? raw : '/';
+
+            const form = document.getElementById('login');
+            const password = document.getElementById('password');
+            const submit = document.getElementById('submit');
+            const error = document.getElementById('error');
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                error.hidden = true;
+                submit.disabled = true;
+                try {
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password: password.value }),
+                    });
+                    if (response.ok) {
+                        location.replace(next);
+                        return;
+                    }
+                    error.textContent =
+                        response.status === 401
+                            ? 'Incorrect password.'
+                            : `Sign in failed (${response.status}).`;
+                } catch {
+                    error.textContent = 'Could not reach the server.';
+                }
+                error.hidden = false;
+                submit.disabled = false;
+                password.select();
+            });
+        </script>
+    </body>
+</html>

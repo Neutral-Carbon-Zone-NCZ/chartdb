@@ -22,6 +22,7 @@ import {
     Copy,
     Pencil,
     Plus,
+    Sparkles,
     SquareArrowOutUpRight,
     Trash2,
     Workflow,
@@ -95,6 +96,33 @@ export const TableNodeContextMenu: React.FC<
                 removeTable(table.id);
             },
             [removeTable, table.id]
+        );
+
+    // Marks the table (or the whole selection) as not existing in the current
+    // database build, as one undo step.
+    const toggleMarkAsNewHandler: React.MouseEventHandler<HTMLDivElement> =
+        useCallback(
+            (e) => {
+                e.stopPropagation();
+                const tableIds = new Set(
+                    isMultiSelect ? selectedTableIds : [table.id]
+                );
+                const isNew = !table.isNew;
+                updateTablesState(
+                    (currentTables) =>
+                        currentTables.map((t) =>
+                            tableIds.has(t.id) ? { id: t.id, isNew } : t
+                        ),
+                    { updateHistory: true }
+                );
+            },
+            [
+                isMultiSelect,
+                selectedTableIds,
+                table.id,
+                table.isNew,
+                updateTablesState,
+            ]
         );
 
     const addRelationshipHandler: React.MouseEventHandler<HTMLDivElement> =
@@ -263,6 +291,18 @@ export const TableNodeContextMenu: React.FC<
                 >
                     <span>{t('table_node_context_menu.add_relationship')}</span>
                     <Workflow className="size-3.5" />
+                </ContextMenuItem>
+                <ContextMenuItem
+                    onClick={toggleMarkAsNewHandler}
+                    className="flex justify-between gap-3"
+                >
+                    <span>
+                        {table.isNew
+                            ? t('table_node_context_menu.unmark_as_new')
+                            : t('table_node_context_menu.mark_as_new')}
+                        {isMultiSelect ? ` (${selectedTableIds.length})` : ''}
+                    </span>
+                    <Sparkles className="size-3.5" />
                 </ContextMenuItem>
                 <ContextMenuSeparator />
                 <ContextMenuSub>
